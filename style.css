@@ -238,13 +238,20 @@ header {
 /* Main Layout */
 main {
     flex: 1;
-    overflow-y: auto;
-    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+    overflow: hidden;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .toolbar {
@@ -826,8 +833,8 @@ main {
 .split-view {
     display: flex;
     gap: 1.5rem;
-    /* Adjust based on typical header height (~70px) + padding */
-    height: calc(100vh - 120px);
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
 }
 
