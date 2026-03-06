@@ -919,11 +919,19 @@ main {
     flex: 1.5;
     display: flex;
     flex-direction: column;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
     min-width: 0;
 }
 
 .visual-pane .toolbar {
-    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background: #f9fafb;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
     flex-shrink: 0;
 }
 
@@ -931,10 +939,9 @@ main {
 .visual-pane .matches-grid {
     overflow-y: auto;
     flex: 1;
-    padding-right: 0.5rem;
+    padding: 1rem;
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
-    padding-bottom: 2rem;
 }
 
 .match-card.selected {

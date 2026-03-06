@@ -51,12 +51,15 @@ const translations = {
         fieldNamePlaceholder: "Nom variable (ex: choices)",
         removeField: "Supprimer",
         fieldType: "Type",
+        fieldText: "Texte (Input)",
         fieldChoice: "Choix (Dropdown)",
         fieldList: "Liste (Selection)",
         fieldMultiline: "Texte Multiligne",
         fieldValues: "Valeurs (une par ligne)",
         fieldValuesPlaceholder: "Option 1\nOption 2",
         dateFormatLabel: "Format de la date",
+        dateHint: "%d(jour), %m(mois), %Y(année), %H:%M",
+        dateParameters: "Paramètres : %d (jour), %m (mois), %Y (année), %H:%M (heure).",
         btnDelete: "Supprimer",
         btnCancel: "Annuler",
         btnSaveMatch: "Valider",
@@ -127,6 +130,7 @@ const translations = {
         typeSimple: "Simple Text",
         typeForm: "Form",
         typeDate: "Date",
+        typeSelect: "Select Type",
         triggerLabel: "Trigger",
         triggerPlaceholder: ":myshortcut",
         triggerHelp: "The text to type to trigger replacement (ex: :date)",
@@ -145,12 +149,15 @@ const translations = {
         fieldNamePlaceholder: "Variable name (ex: choices)",
         removeField: "Delete",
         fieldType: "Type",
+        fieldText: "Text (Input)",
         fieldChoice: "Choice (Dropdown)",
         fieldList: "List (Selection)",
         fieldMultiline: "Multiline Text",
         fieldValues: "Values (one per line)",
         fieldValuesPlaceholder: "Option 1\nOption 2",
         dateFormatLabel: "Date Format",
+        dateHint: "%d(day), %m(month), %Y(year), %H:%M",
+        dateParameters: "Parameters: %d (day), %m (month), %Y (year), %H:%M (hour).",
         btnDelete: "Delete",
         btnCancel: "Cancel",
         btnSaveMatch: "Apply",
@@ -429,43 +436,43 @@ function hideGlobalTooltip() {
 function updateLanguageUI() {
     const t = translations[currentLang];
 
-    // Update data-i18n elements
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        // Skip buttons in feedback state to avoid flickering
-        if (el.closest('.btn-feedback-active')) return;
+    // Select all elements with translation attributes, including those in templates
+    const elements = Array.from(document.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]'));
 
-        const key = el.dataset.i18n;
-        if (t[key]) {
-            // Handle HTML if it's the help modal description
-            if (key === 'espansoDesc') {
-                el.innerHTML = t[key];
-            } else {
-                el.innerText = t[key];
+    // Add elements from within templates
+    document.querySelectorAll('template').forEach(template => {
+        elements.push(...Array.from(template.content.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]')));
+    });
+
+    elements.forEach(el => {
+        // Skip buttons in feedback state to avoid flickering
+        if (el.closest && el.closest('.btn-feedback-active')) return;
+
+        // data-i18n (text/html)
+        if (el.dataset.i18n) {
+            const key = el.dataset.i18n;
+            if (t[key]) {
+                if (key === 'espansoDesc') el.innerHTML = t[key];
+                else el.innerText = t[key];
             }
         }
-    });
 
-    // Update data-i18n-placeholder elements
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.dataset.i18nPlaceholder;
-        if (t[key]) {
-            el.placeholder = t[key];
+        // data-i18n-placeholder
+        if (el.dataset.i18nPlaceholder) {
+            const key = el.dataset.i18nPlaceholder;
+            if (t[key]) el.placeholder = t[key];
         }
-    });
 
-    // Update data-i18n-title elements
-    document.querySelectorAll('[data-i18n-title]').forEach(el => {
-        const key = el.dataset.i18nTitle;
-        if (t[key]) {
-            el.title = t[key];
+        // data-i18n-title
+        if (el.dataset.i18nTitle) {
+            const key = el.dataset.i18nTitle;
+            if (t[key]) el.title = t[key];
         }
-    });
 
-    // Update data-i18n-tooltip elements
-    document.querySelectorAll('[data-i18n-tooltip]').forEach(el => {
-        const key = el.dataset.i18nTooltip;
-        if (t[key]) {
-            el.setAttribute('data-tooltip', t[key]);
+        // data-i18n-tooltip
+        if (el.dataset.i18nTooltip) {
+            const key = el.dataset.i18nTooltip;
+            if (t[key]) el.setAttribute('data-tooltip', t[key]);
         }
     });
 
@@ -1047,7 +1054,8 @@ function addFieldRow(name = '', data = null) {
                 hint.style.marginTop = '4px';
                 hint.style.fontSize = '0.75rem';
                 hint.style.color = 'var(--text-secondary)';
-                hint.innerHTML = '%d(jour), %m(mois), %Y(année), %H:%M';
+                hint.setAttribute('data-i18n', 'dateHint');
+                hint.innerHTML = t('dateHint');
                 valuesInput.parentElement.appendChild(hint);
             }
             hint.style.display = 'block';
