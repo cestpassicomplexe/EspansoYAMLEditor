@@ -1,2149 +1,2601 @@
-:root {
-    --bg-color: #f3f4f6;
-    --card-bg: #ffffff;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --accent-color: #10b981;
-    --danger-color: #ef4444;
-    --border-color: #e5e7eb;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header */
-header {
-    background-color: var(--card-bg);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-}
-
-.logo-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-}
-
-.logo {
-    font-weight: 600;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-primary);
-}
-
-.header-subtitle {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-left: 1.8rem;
-    /* Align with text after logo icon (24px + 8px gap approx) */
-}
-
-.actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-}
-
-.lang-switcher {
-    display: flex;
-    background: #f3f4f6;
-    border-radius: 6px;
-    padding: 2px;
-    border: 1px solid var(--border-color);
-    margin-right: 0.5rem;
-}
-
-.lang-btn {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--text-secondary);
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.lang-btn.active {
-    background: white;
-    color: var(--primary-color);
-    box-shadow: var(--shadow-sm);
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-}
-
-.btn.small {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-}
-
-.btn.primary {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.btn.primary:hover {
-    background-color: var(--primary-hover);
-}
-
-.btn.secondary {
-    background-color: white;
-    border-color: var(--border-color);
-    color: var(--text-primary);
-}
-
-.btn.secondary:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
-}
-
-.btn.accent {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.btn.accent:hover {
-    filter: brightness(90%);
-}
-
-.btn.danger {
-    background-color: white;
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
-}
-
-.btn.danger:hover {
-    background-color: #fef2f2;
-}
-
-#btnHelp {
-    padding: 0.5rem;
-    width: 2.25rem;
-    height: 2.25rem;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.btn-icon {
-    padding: 0.2rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-secondary);
-}
-
-.btn-icon:hover {
-    color: var(--danger-color);
-}
-
-/* Split Button & Dropdown */
-.dropdown-container {
-    position: relative;
-    display: inline-block;
-}
-
-.split-button {
-    display: inline-flex;
-    align-items: stretch;
-}
-
-.split-button #btnSave {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.split-button .dropdown-toggle {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    box-shadow: var(--shadow-md);
-    z-index: 1001;
-    min-width: 180px;
-    padding: 0.5rem 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 1rem;
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.dropdown-item:hover {
-    background-color: #f3f4f6;
-}
-
-.dropdown-item svg {
-    color: var(--text-secondary);
-}
-
-
-/* Main Layout */
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 1.5rem;
-    overflow: hidden;
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
-.toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.status-bar {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* Matches Grid */
-.matches-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-}
-
-.match-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 1rem;
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-    position: relative;
-}
-
-.match-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary-color);
-}
-
-.match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.trigger-badge {
-    background-color: #eff6ff;
-    color: var(--primary-color);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-family: monospace;
-    font-weight: 600;
-}
-
-.type-badge {
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-}
-
-.match-content {
-    background-color: #f9fafb;
-    padding: 0.75rem;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    white-space: pre-wrap;
-    color: #374151;
-    overflow-x: hidden;
-    max-height: 150px;
-    overflow-y: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-secondary);
-    background: var(--card-bg);
-    border-radius: 0.5rem;
-    border: 2px dashed var(--border-color);
-}
-
-
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    position: relative;
-    background-color: var(--card-bg);
-    border-radius: 0.5rem;
-    width: 100%;
-    max-width: 650px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-    padding: 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-}
-
-.modal-body {
-    padding: 1.5rem;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
-.modal-footer {
-    padding: 1.25rem;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    background-color: #f9fafb;
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-}
-
-.spacer {
-    flex: 1;
-}
-
-/* Type Overlay */
-.type-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--card-bg);
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 0.5rem;
-}
-
-.type-selection-content {
-    text-align: center;
-    max-width: 500px;
-    padding: 2rem;
-}
-
-.type-selection-content h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-}
-
-.type-selection-content p {
-    color: var(--text-secondary);
-    margin-bottom: 2rem;
-}
-
-.type-buttons-large {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-}
-
-.type-btn-large {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem 1rem;
-    background: white;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text-primary);
-}
-
-.type-btn-large svg {
-    color: var(--primary-color);
-    transition: transform 0.2s;
-}
-
-.type-btn-large:hover {
-    border-color: var(--primary-color);
-    background: #eff6ff;
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-feedback-active {
-    background-color: #10b981 !important;
-    border-color: #059669 !important;
-    color: white !important;
-}
-
-.btn-feedback-active svg {
-    color: white !important;
-}
-
-.type-btn-large:hover svg {
-    transform: scale(1.1);
-}
-
-.type-btn-large span {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-/* Form Elements */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-group label {
-    font-weight: 500;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-/* Tooltips */
-.tooltip-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #e5e7eb;
-    color: var(--text-secondary);
-    font-size: 0.7rem;
-    cursor: help;
-    font-weight: bold;
-    font-style: normal;
-    position: relative;
-}
-
-.tooltip-icon:hover {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* Global Tooltip (JS managed) */
-.global-tooltip {
-    position: fixed;
-    background-color: #1f2937;
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    white-space: normal;
-    max-width: 250px;
-    z-index: 9999;
-    pointer-events: none;
-    line-height: 1.4;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.global-tooltip.visible {
-    opacity: 1;
-}
-
-.form-group input[type="text"],
-.form-group textarea,
-.form-group select {
-    padding: 0.6rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    font-family: inherit;
-    font-size: 0.95rem;
-}
-
-.form-group textarea {
-    font-family: monospace;
-    resize: vertical;
-}
-
-.form-group small {
-    color: var(--text-secondary);
-}
-
-/* Type Selector */
-.type-selector {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.type-option {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.input-with-prefix {
-    display: flex;
-    align-items: center;
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.input-with-prefix .prefix {
-    background-color: #f3f4f6;
-    padding: 0.6rem 0.8rem;
-    color: var(--text-secondary);
-    border-right: 1px solid var(--border-color);
-}
-
-.input-with-prefix input {
-    border: none !important;
-    border-radius: 0 !important;
-    flex: 1;
-}
-
-/* Visual Builder Styles */
-.info-box {
-    background-color: #eff6ff;
-    padding: 0.75rem;
-    border-radius: 4px;
-    border-left: 3px solid var(--primary-color);
-    font-size: 0.9rem;
-    color: #1e40af;
-}
-
-.alert-box {
-    background-color: #fffbeb;
-    padding: 0.75rem;
-    border-radius: 4px;
-    border-left: 3px solid #f59e0b;
-    font-size: 0.9rem;
-    color: #92400e;
-    margin-top: 1rem;
-}
-
-.fields-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.field-row {
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    background: #f9fafb;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.field-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.field-header input {
-    flex: 0 0 50%;
-    font-family: monospace;
-    font-weight: 600;
-}
-
-.field-body {
-    display: flex;
-    gap: 1rem;
-}
-
-.field-body .col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-/* Options list (structured text/value editor for choice/list) */
-.options-list-container {
-    display: none;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px dashed var(--border-color);
-}
-
-.field-row[data-has-options="true"] .options-list-container {
-    display: flex;
-}
-
-.options-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.options-list-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.option-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    padding: 0.5rem;
-}
-
-.option-fields {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.option-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.option-field label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.option-field input,
-.option-field textarea {
-    padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.25rem;
-    font-family: inherit;
-    font-size: 0.85rem;
-    width: 100%;
-}
-
-.option-field textarea {
-    font-family: monospace;
-    resize: vertical;
-    min-height: 2.4rem;
-}
-
-.option-row .remove-option {
-    flex: 0 0 auto;
-    margin-top: 0.25rem;
-    font-size: 1.1rem;
-    line-height: 1;
-    padding: 0.2rem 0.4rem;
-}
-
-/* Form Preview */
-.form-preview {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 2px solid var(--border-color);
-}
-
-.form-preview label {
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
-.preview-ui {
-    background: #f9fafb;
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.preview-inline-container {
-    line-height: 2.2;
-    white-space: pre-wrap;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-}
-
-.inline-field-wrapper {
-    display: inline-block;
-    margin: 0 4px;
-    vertical-align: middle;
-}
-
-.inline-input {
-    border: 1px solid var(--primary-color);
-    background: #eff6ff;
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: var(--primary-color);
-    font-weight: 500;
-}
-
-/* Specific tooltip or placeholder style for inputs */
-.inline-input::placeholder {
-    color: #93c5fd;
-}
-
-.inline-text {
-    vertical-align: middle;
-}
-
-.inline-date-preview {
-    display: inline-block;
-    background: #d1fae5;
-    color: #065f46;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 600;
-    font-family: monospace;
-    font-size: 0.9rem;
-    border: 1px solid #6ee7b7;
-    margin: 0 4px;
-    vertical-align: middle;
-}
-
-.info-box.success {
-    background-color: #ecfdf5;
-    border-left-color: #10b981;
-    color: #065f46;
-}
-
-/* Help Modal Specifics */
-.help-tip {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    background-color: #f3f4f6;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    border-left: 3px solid #9ca3af;
-    margin-top: 0.75rem;
-    font-style: italic;
-}
-
-/* Help Modal Table */
-.os-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-    font-size: 0.85rem;
-    background: #f9fafb;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-}
-
-.os-table th,
-.os-table td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.os-table th {
-    background-color: #f3f4f6;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.os-table tr:last-child td {
-    border-bottom: none;
-}
-
-.os-table code {
-    background: #e5e7eb;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-family: monospace;
-    display: block;
-    word-break: break-all;
-}
-
-.os-table .btn-copy-mini {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.7rem;
-    margin-top: 0.4rem;
-}
-
-.path-display {
-    background: #1f2937;
-    color: #e5e7eb;
-    padding: 0.75rem;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: monospace;
-    margin: 1rem 0;
-}
-
-/* Split View Layout */
-.split-view {
-    display: flex;
-    gap: 1.5rem;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-}
-
-/* Sidebar Pane */
-.sidebar-pane {
-flex: 0 0 300px;
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-}
-
-.sidebar-toolbar {
-    padding: 0.5rem 1rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0 !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebar-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.sidebar-section-header .btn-icon {
-    padding: 0.25rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-    opacity: 0.5;
-}
-
-.sidebar-section-header .btn-icon:hover {
-    opacity: 1;
-    background-color: #e5e7eb;
-    color: var(--text-primary);
-}
-
-.sidebar-toolbar h3 {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.sidebar-actions {
-    display: flex;
-    gap: 0.25rem;
-    align-items: center;
-}
-
-.sidebar-actions .btn-icon {
-    padding: 0.25rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-    opacity: 0.5;
-}
-
-.sidebar-actions .btn-icon:hover {
-    opacity: 1;
-    background-color: #e5e7eb;
-    color: var(--text-primary);
-}
-
-.sidebar-list {
-    overflow-y: auto;
-    flex: 1;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
-}
-
-.sidebar-item {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-    cursor: grab;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    transition: all 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-left: 3px solid transparent;
-}
-
-.sidebar-item:active {
-    cursor: grabbing;
-}
-
-.sidebar-item:hover {
-    background-color: #f9fafb;
-    color: var(--primary-color);
-}
-
-.sidebar-item.selected {
-    background-color: #eff6ff;
-    color: var(--primary-color);
-    font-weight: 600;
-    border-left-color: var(--primary-color);
-}
-
-.sidebar-item.dragging {
-    opacity: 0.4;
-    background-color: #f3f4f6;
-}
-
-.sidebar-item.drag-over {
-    border-top: 2px solid var(--primary-color);
-    background-color: #f0f7ff;
-}
-
-.visual-pane {
-    flex: 1.5;
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    min-width: 0;
-}
-
-.visual-pane .toolbar {
-    padding: 0.5rem 1rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0;
-    flex-shrink: 0;
-}
-
-/* Adjust matches grid to scroll within the pane */
-.visual-pane .matches-grid {
-    overflow-y: auto;
-    flex: 1;
-    padding: 1rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
-}
-
-.match-card.selected {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-    background-color: #fdfdff;
-}
-
-/* YAML Preview Pane */
-.yaml-pane {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    min-width: 0;
-}
-
-.preview-toolbar {
-    padding: 0.5rem 1rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.preview-toolbar h3 {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.preview-toolbar .actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-#yamlEditor {
-    flex: 1;
-    width: 100%;
-    border: none;
-    resize: none;
-    padding: 1rem;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    background-color: var(--card-bg);
-    color: var(--text-primary);
-    outline: none;
-    white-space: pre;
-    overflow: auto;
-    tab-size: 2;
-}
-
-#yamlEditor::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.5;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .split-view {
-        flex-direction: column;
-        height: auto;
+/**
+ * Espanso Editor Logic
+ * Handles File System Access API, YAML parsing/dumping, and UI rendering.
+ * UNIFIED EDITOR VERSION - Uses {{var}} syntax, auto-detected variables, always-visible preview
+ */
+
+// --- Translations ---
+const translations = {
+    fr: {
+        appTitle: "Espanso YAML Editor",
+        headerSubtitle: "Créez vos raccourcis Espanso facilement",
+        btnOpen: "Ouvrir un fichier",
+        btnOpenFolder: "Ouvrir un dossier",
+        statusFolderOpened: "Dossier ouvert : ",
+        noYamlFilesFound: "Aucun fichier YAML (.yml ou .yaml) trouvé dans ce dossier.",
+        sidebarFiles: "Fichiers",
+        sidebarTriggers: "Raccourcis",
+        btnSave: "Enregistrer",
+        btnSaveAs: "Enregistrer sous...",
+        btnDropdownTitle: "Plus d'options",
+        btnHelpTitle: "Aide",
+        statusEmpty: "Prêt. Aucun fichier ouvert.",
+        statusOpened: "Fichier ouvert : ",
+        statusSaved: "Sauvegardé ! ",
+        statusSavedShort: "Enregistré !",
+        statusErrorLoading: "Erreur lors de l'ouverture du fichier.",
+        statusErrorSaving: "Erreur lors de la sauvegarde.",
+        btnAddMatch: "Ajouter un Match",
+        welcomeMessage: "Commencez par ouvrir un fichier .yml ou créez un nouveau match.",
+        yamlPreviewTitle: "Aperçu YAML",
+        btnFormat: "Formater",
+        btnFormatTitle: "Formater le code",
+        btnCopy: "Copier",
+        btnCopyTitle: "Copier le contenu",
+        yamlPlaceholder: "# Le contenu YAML apparaîtra ici...",
+        editMatch: "Éditer le Match",
+        newMatch: "Nouveau Match",
+        contentType: "Type de contenu",
+        typeSimple: "Texte Simple",
+        typeRich: "Texte riche",
+        typeInteractive: "Formulaire",
+        typeDate: "Date",
+        triggerLabel: "Déclencheur (Trigger)",
+        triggerPlaceholder: ":monraccourci",
+        triggerHelp: "Le texte à taper pour déclencher le remplacement (ex: :date)",
+        contentPlaceholder: "Votre texte ici... Utilisez {{nom}} pour créer des variables.",
+        previewLabel: "Aperçu",
+        insertLabel: "Insérer",
+        insertText: "Champ texte",
+        insertChoice: "Choix (dropdown)",
+        insertList: "Liste (selection)",
+        insertMultiline: "Texte multilignes",
+        varsConfigTitle: "Variables détectées",
+        varsConfigHint: "Utilisez {{nom}} dans le texte pour créer une variable",
+        dateConfigTitle: "Format de date par défaut",
+        varTypeStatic: "Texte (static)",
+        varTypeChoice: "Choix (dropdown)",
+        varTypeList: "Liste (selection)",
+        varTypeMultiline: "Texte multilignes",
+        varTypeDate: "Date",
+        varDefaultValue: "Valeur par défaut",
+        varDateFormat: "Format",
+        varChoicesList: "Options",
+        addOption: "+ Ajouter",
+        tooltipContentType: "Choisissez si vous voulez un texte simple, un texte riche (HTML/Markdown), un contenu interactif avec variables, ou une date automatique.",
+        tooltipTrigger: "Le mot-clé (souvent commençant par :) qui déclenchera le remplacement.",
+        selectTypeTitle: "Quel type de raccourci ?",
+        selectTypeDesc: "Choisissez le format de base.",
+        dateParameters: "Paramètres : %d (jour), %m (mois), %Y (année), %H:%M (heure).",
+        btnDelete: "Supprimer",
+        btnCancel: "Annuler",
+        btnSaveMatch: "Valider",
+        alertTriggerRequired: "Le trigger est obligatoire.",
+        confirmDelete: "Supprimer ce match ?",
+        noMatchesFound: "Aucun match trouvé.",
+        copied: "Copié !",
+        dynamicContent: "(Contenu dynamique)",
+        sidebarTitle: "Explorateur",
+        btnNewFile: "Nouveau fichier YML",
+        btnNewFolder: "Nouveau dossier",
+        promptFileName: "Nom du fichier YML :",
+        promptFolderName: "Nom du dossier :",
+        newFileCreated: "Nouveau fichier créé : ",
+        newFolderCreated: "Nouveau dossier créé : ",
+        errorCreatingFile: "Erreur lors de la création du fichier.",
+        errorCreatingFolder: "Erreur lors de la création du dossier.",
+        confirmOverwriteFile: "Le fichier existe déjà. Voulez-vous l'écraser ?",
+        noFolderOpened: "Vous devez d'abord ouvrir un dossier.",
+        btnGotIt: "Compris",
+        alertNoApi: "Votre navigateur ne supporte pas l'API d'accès aux fichiers native.",
+        confirmOverwrite: "Confirmer ?",
+        alertFormRequired: "Un formulaire doit contenir au moins une variable {{nom}}.",
+        richModeHtml: "HTML",
+        richModeMarkdown: "Markdown",
+        previewTypeSimple: "Texte simple",
+        previewTypeRich: "Rendu HTML",
+        previewTypeInteractive: "Aperçu interactif",
+        previewTypeDate: "Aperçu date",
+        formPreviewTitle: "Formulaire de saisie",
+        resultPreviewTitle: "Texte généré (Résultat)",
+        dateGuideLink: "Guide complet des formats (Chrono)",
+        noVarsDetected: "Aucune variable détectée dans votre texte. Utilisez le bouton d'insertion ou écrivez {{nom_variable}}."
+    },
+    en: {
+        appTitle: "Espanso YAML Editor",
+        dateGuideLink: "Full format guide (Chrono)",
+        headerSubtitle: "Create your Espanso shortcuts easily",
+        btnOpen: "Open File",
+        btnOpenFolder: "Open Folder",
+        statusFolderOpened: "Folder opened: ",
+        noYamlFilesFound: "No YAML files (.yml or .yaml) found in this folder.",
+        sidebarFiles: "Files",
+        sidebarTriggers: "Shortcuts",
+        btnSave: "Save",
+        btnSaveAs: "Save As...",
+        btnDropdownTitle: "More options",
+        btnHelpTitle: "Help",
+        statusEmpty: "Ready. No file opened.",
+        statusOpened: "File opened: ",
+        statusSaved: "Saved! ",
+        statusSavedShort: "Saved !",
+        statusErrorLoading: "Error loading file.",
+        statusErrorSaving: "Error saving file.",
+        btnAddMatch: "Add a Match",
+        welcomeMessage: "Start by opening a .yml file or create a new match.",
+        yamlPreviewTitle: "YAML Preview",
+        btnFormat: "Format",
+        btnFormatTitle: "Format code",
+        btnCopy: "Copy",
+        btnCopyTitle: "Copy content",
+        yamlPlaceholder: "# YAML content will appear here...",
+        editMatch: "Edit Match",
+        newMatch: "New Match",
+        contentType: "Content Type",
+        typeSimple: "Simple Text",
+        typeRich: "Rich Text",
+        typeInteractive: "Form",
+        typeDate: "Date",
+        triggerLabel: "Trigger",
+        triggerPlaceholder: ":myshortcut",
+        triggerHelp: "The text to type to trigger replacement (ex: :date)",
+        contentPlaceholder: "Your text here... Use {{name}} to create variables.",
+        previewLabel: "Preview",
+        insertLabel: "Insert",
+        insertText: "Text field",
+        insertChoice: "Choice (dropdown)",
+        insertList: "List (selection)",
+        insertMultiline: "Multiline text",
+        varsConfigTitle: "Detected Variables",
+        varsConfigHint: "Use {{name}} in the text to create a variable",
+        dateConfigTitle: "Default date format",
+        varTypeStatic: "Text (static)",
+        varTypeChoice: "Choice (dropdown)",
+        varTypeList: "List (selection)",
+        varTypeMultiline: "Multiline text",
+        varTypeDate: "Date",
+        varDefaultValue: "Default value",
+        varDateFormat: "Format",
+        varChoicesList: "Options",
+        addOption: "+ Add",
+        tooltipContentType: "Choose between simple text, rich text (HTML/Markdown), interactive content with variables, or an automatic date.",
+        tooltipTrigger: "The keyword (often starting with :) that will trigger the replacement.",
+        selectTypeTitle: "What type of shortcut?",
+        selectTypeDesc: "Choose the base format.",
+        dateParameters: "Parameters: %d (day), %m (month), %Y (year), %H:%M (hour).",
+        btnDelete: "Delete",
+        btnCancel: "Cancel",
+        btnSaveMatch: "Apply",
+        alertTriggerRequired: "Trigger is mandatory.",
+        confirmDelete: "Delete this match?",
+        noMatchesFound: "No matches found.",
+        copied: "Copied!",
+        dynamicContent: "(Dynamic content)",
+        sidebarTitle: "Explorer",
+        btnNewFile: "New YML file",
+        btnNewFolder: "New folder",
+        promptFileName: "YML file name:",
+        promptFolderName: "Folder name:",
+        newFileCreated: "New file created: ",
+        newFolderCreated: "New folder created: ",
+        errorCreatingFile: "Error creating file.",
+        errorCreatingFolder: "Error creating folder.",
+        confirmOverwriteFile: "File already exists. Overwrite?",
+        noFolderOpened: "You must open a folder first.",
+        btnGotIt: "Got it",
+        alertNoApi: "Your browser does not support the native file access API.",
+        confirmOverwrite: "Confirm?",
+        alertFormRequired: "A form must contain at least one {{variable}}.",
+        richModeHtml: "HTML",
+        richModeMarkdown: "Markdown",
+        previewTypeSimple: "Simple text",
+        previewTypeRich: "HTML render",
+        previewTypeInteractive: "Interactive preview",
+        previewTypeDate: "Date preview",
+        formPreviewTitle: "Input Form",
+        resultPreviewTitle: "Generated Text (Result)",
+        noVarsDetected: "No variables detected in your text. Use the insert button or write {{variable_name}}."
+    }
+};
+
+// --- Rich Text Mode ---
+let currentRichMode = 'html';
+
+// Global State
+let currentMatches = [];
+let fileHandle = null;
+let currentLang = 'fr';
+let activeMatchType = 'simple';
+let isSingleFileModified = false; // Ajouté pour le suivi en mode fichier unique
+
+// Folder mode state
+let isFolderMode = false;
+let folderFiles = [];
+let folderDirs = []; // Stocke la liste de tous les répertoires (y compris les dossiers vides)
+let activeFolderFileIndex = -1;
+let currentDirHandle = null;
+
+// Sort state
+let sortDirection = 1;
+let fileSortDirection = 1;
+
+// Expanded state for folder tree
+let expandedFolders = {};
+
+// Editor state
+let editingIndex = -1;
+let isPopulating = false;
+
+// Check API Support
+const supportsFileSystemAPI = 'showOpenFilePicker' in window;
+
+// DOM Elements
+const dom = {
+    matchesList: document.getElementById('matchesList'),
+    statusMessage: document.getElementById('statusMessage'),
+    btnLoad: document.getElementById('btnLoad'),
+    btnOpenFolder: document.getElementById('btnOpenFolder'),
+    btnSave: document.getElementById('btnSave'),
+    btnSaveAs: document.getElementById('btnSaveAs'),
+    btnDropdown: document.getElementById('btnDropdown'),
+    saveDropdown: document.getElementById('saveDropdown'),
+    btnAdd: document.getElementById('btnAdd'),
+    sidebarList: document.getElementById('sidebarList'),
+    btnHelp: document.getElementById('btnHelp'),
+
+    helpModal: document.getElementById('helpModal'),
+    btnCloseHelp: document.getElementById('btnCloseHelp'),
+    btnCloseHelpFooter: document.getElementById('btnCloseHelpFooter'),
+
+    editorModal: document.getElementById('editorModal'),
+    modalTitle: document.getElementById('modalTitle'),
+    btnCloseModal: document.getElementById('btnCloseModal'),
+    btnCancel: document.getElementById('btnCancel'),
+    btnSaveMatch: document.getElementById('btnSaveMatch'),
+    btnDeleteMatch: document.getElementById('btnDeleteMatch'),
+    typeOverlay: document.getElementById('typeOverlay'),
+    typeButtons: document.querySelectorAll('.type-btn-large'),
+
+    triggerInput: document.getElementById('triggerInput'),
+    contentInput: document.getElementById('contentInput'),
+
+    // Unified editor elements
+    previewSection: document.getElementById('previewSection'),
+    previewContent: document.getElementById('previewContent'),
+    previewTypeLabel: document.getElementById('previewTypeLabel'),
+    varsConfigPanel: document.getElementById('varsConfigPanel'),
+    varsConfigList: document.getElementById('varsConfigList'),
+    dateFormatConfig: document.getElementById('dateFormatConfig'),
+    dateFormatDefault: document.getElementById('dateFormatDefault'),
+
+    // Live Preview
+    yamlEditor: document.getElementById('yamlEditor'),
+    btnFormatYaml: document.getElementById('btnFormatYaml'),
+    btnCopyYaml: document.getElementById('btnCopyYaml'),
+
+    // New folder/file buttons
+    btnNewFile: document.getElementById('btnNewFile'),
+    btnNewFolder: document.getElementById('btnNewFolder'),
+
+    // Lang buttons
+    langBtns: document.querySelectorAll('.lang-btn'),
+    btnSortAlpha: null,
+    btnSortFiles: null,
+
+    // Insert menu
+    btnInsertToggle: document.getElementById('btnInsertToggle'),
+    insertMenu: document.getElementById('insertMenu'),
+    insertMenuItems: document.querySelectorAll('.insert-menu-item'),
+
+    // Toolbar mode toggle
+    unifiedModeToggle: document.getElementById('unifiedModeToggle'),
+    mdToolbarBtns: document.querySelectorAll('.unified-toolbar .md-toolbar-btn'),
+    mdModeBtns: document.querySelectorAll('.unified-mode-toggle .md-mode-btn'),
+
+    // Templates
+    varConfigRowTemplate: document.getElementById('varConfigRowTemplate'),
+    varOptionRowTemplate: document.getElementById('varOptionRowTemplate')
+};
+
+// --- Initialization ---
+function init() {
+    const savedLang = localStorage.getItem('espanso_lang');
+    if (savedLang && translations[savedLang]) {
+        currentLang = savedLang;
     }
 
-    .sidebar-pane {
-        display: none;
-        /* Hide sidebar on mobile or handle differently */
+    updateLanguageUI();
+    setupEventListeners();
+    renderMatches();
+    updateYamlPreview();
+
+    // Empêche la fermeture accidentelle du navigateur en cas de modifications non sauvegardées
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+}
+
+function setupEventListeners() {
+    dom.btnLoad.addEventListener('click', loadFile);
+    if (dom.btnOpenFolder) {
+        dom.btnOpenFolder.addEventListener('click', loadFolder);
+    }
+    dom.btnSave.addEventListener('click', (e) => saveFile(e.currentTarget));
+    dom.btnSaveAs.addEventListener('click', (e) => {
+        saveFileAs(e.currentTarget);
+        closeDropdown();
+    });
+    dom.btnDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dom.saveDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', closeDropdown);
+    dom.btnAdd.addEventListener('click', () => openEditor());
+
+    dom.btnCloseModal.addEventListener('click', closeEditor);
+    dom.btnCancel.addEventListener('click', closeEditor);
+
+    // Help
+    dom.btnHelp.addEventListener('click', openHelp);
+    dom.btnCloseHelp.addEventListener('click', closeHelp);
+    dom.btnCloseHelpFooter.addEventListener('click', closeHelp);
+
+    // Initial Type Selection (overlay)
+    dom.typeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            setMatchType(type);
+            updateEditorUI();
+            dom.typeOverlay.classList.add('hidden');
+        });
+    });
+
+    // Content input -> update preview and vars
+    dom.contentInput.addEventListener('input', () => {
+        updatePreview();
+        syncVarsFromText();
+    });
+
+    // Insert menu toggle
+    if (dom.btnInsertToggle) {
+        dom.btnInsertToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dom.insertMenu.classList.toggle('hidden');
+        });
+    }
+    document.addEventListener('click', () => {
+        if (dom.insertMenu) dom.insertMenu.classList.add('hidden');
+    });
+
+    // Insert menu items
+    dom.insertMenuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const type = item.dataset.insertType;
+            insertVariable(type);
+            dom.insertMenu.classList.add('hidden');
+        });
+    });
+
+    // Toolbar format buttons
+    dom.mdToolbarBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleFormatToolbar(btn.dataset.md);
+        });
+    });
+
+    // Mode toggle (HTML/Markdown)
+    dom.mdModeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentRichMode = btn.dataset.richMode;
+            dom.mdModeBtns.forEach(b => b.classList.toggle('active', b.dataset.richMode === currentRichMode));
+            updatePreview();
+        });
+    });
+
+    // Date default format
+    if (dom.dateFormatDefault) {
+        dom.dateFormatDefault.addEventListener('input', updatePreview);
     }
 
-    .visual-pane,
-    .yaml-pane {
-        height: 500px;
-        margin-bottom: 2rem;
+    // Live Preview
+    dom.yamlEditor.addEventListener('input', handleYamlEditorInput);
+    dom.btnFormatYaml.addEventListener('click', formatYamlPreview);
+    dom.btnCopyYaml.addEventListener('click', copyYamlContent);
+
+    // Lang Switchers
+    dom.langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            localStorage.setItem('espanso_lang', currentLang);
+            updateLanguageUI();
+            renderMatches();
+            if (!dom.editorModal.classList.contains('hidden')) {
+                updateEditorUI();
+                updatePreview();
+            }
+        });
+    });
+
+    // New file/folder
+    if (dom.btnNewFile) {
+        dom.btnNewFile.addEventListener('click', createNewFile);
+    }
+    if (dom.btnNewFolder) {
+        dom.btnNewFolder.addEventListener('click', createNewFolder);
     }
 
-    body {
-        height: auto;
-        overflow-y: auto;
+    initTooltips();
+}
+
+// --- Tooltips Logic ---
+let globalTooltip = null;
+
+function initTooltips() {
+    if (!document.querySelector('.global-tooltip')) {
+        globalTooltip = document.createElement('div');
+        globalTooltip.className = 'global-tooltip';
+        document.body.appendChild(globalTooltip);
+    } else {
+        globalTooltip = document.querySelector('.global-tooltip');
     }
 
-    main {
-        overflow: visible;
+    document.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('tooltip-icon')) {
+            const text = e.target.getAttribute('data-tooltip');
+            if (text) showGlobalTooltip(e.target, text);
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        if (e.target.classList.contains('tooltip-icon')) hideGlobalTooltip();
+    });
+
+    document.addEventListener('scroll', hideGlobalTooltip, true);
+    window.addEventListener('resize', hideGlobalTooltip);
+}
+
+function showGlobalTooltip(target, text) {
+    if (!globalTooltip) return;
+    globalTooltip.textContent = text;
+    globalTooltip.classList.add('visible');
+    const rect = target.getBoundingClientRect();
+    const tooltipRect = globalTooltip.getBoundingClientRect();
+    let top = rect.top - tooltipRect.height - 10;
+    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+    if (top < 10) top = rect.bottom + 10;
+    if (left < 10) left = 10;
+    if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipRect.width - 10;
+    }
+    globalTooltip.style.top = `${top}px`;
+    globalTooltip.style.left = `${left}px`;
+}
+
+function hideGlobalTooltip() {
+    if (globalTooltip) globalTooltip.classList.remove('visible');
+}
+
+// --- I18n Logic ---
+
+function updateLanguageUI() {
+    const t = translations[currentLang];
+    const elements = Array.from(document.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]'));
+    document.querySelectorAll('template').forEach(template => {
+        elements.push(...Array.from(template.content.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]')));
+    });
+
+    elements.forEach(el => {
+        if (el.closest && el.closest('.btn-feedback-active')) return;
+        if (el.dataset.i18n) {
+            const key = el.dataset.i18n;
+            if (t[key]) {
+                if (key === 'espansoDesc') el.innerHTML = t[key];
+                else el.innerText = t[key];
+            }
+        }
+        if (el.dataset.i18nPlaceholder) {
+            const key = el.dataset.i18nPlaceholder;
+            if (t[key]) el.placeholder = t[key];
+        }
+        if (el.dataset.i18nTitle) {
+            const key = el.dataset.i18nTitle;
+            if (t[key]) el.title = t[key];
+        }
+        if (el.dataset.i18nTooltip) {
+            const key = el.dataset.i18nTooltip;
+            if (t[key]) el.setAttribute('data-tooltip', t[key]);
+        }
+    });
+
+    dom.langBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+
+    document.querySelectorAll('.type-btn-large').forEach(btn => {
+        const type = btn.dataset.type;
+        const key = 'type' + type.charAt(0).toUpperCase() + type.slice(1);
+        const span = btn.querySelector('span');
+        if (span && t[key]) span.innerText = t[key];
+    });
+
+    if (!fileHandle) {
+        dom.statusMessage.innerText = t.statusEmpty;
     }
 }
 
-/* Footer */
-.main-footer {
-    background-color: var(--card-bg);
-    border-top: 1px solid var(--border-color);
-    padding: 1rem 1.5rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+function t(key) {
+    return translations[currentLang][key] || key;
 }
 
-.footer-content {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+function closeDropdown() {
+    if (dom.saveDropdown) dom.saveDropdown.classList.add('hidden');
 }
 
-.main-footer a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
+// --- Help Logic ---
+function openHelp() { dom.helpModal.classList.remove('hidden'); }
+function closeHelp() { dom.helpModal.classList.add('hidden'); }
+
+function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => showFeedback(btn, 'copied'));
 }
 
-.main-footer a:hover {
-    text-decoration: underline;
+function showFeedback(btn, key) {
+    const span = btn.querySelector('span[data-i18n]') || btn;
+    const originalKey = span.getAttribute('data-i18n');
+    btn.classList.add('btn-feedback-active');
+    span.innerText = translations[currentLang][key] || key;
+    setTimeout(() => {
+        btn.classList.remove('btn-feedback-active');
+        if (originalKey) span.innerText = translations[currentLang][originalKey];
+    }, 2000);
 }
 
-.heart {
-    color: var(--danger-color);
-    font-size: 1rem;
-    margin: 0 0.1rem;
+function hasUnsavedChanges() {
+    if (isFolderMode) {
+        return folderFiles.some(f => f.isModified);
+    }
+    return isSingleFileModified;
 }
 
-@media (max-width: 600px) {
-    .footer-content {
-        flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
+function confirmUnsavedChanges() {
+    if (hasUnsavedChanges()) {
+        const message = currentLang === 'fr' 
+            ? "Vous avez des modifications non enregistrées. Voulez-vous vraiment continuer sans sauvegarder ?" 
+            : "You have unsaved changes. Do you really want to proceed without saving?";
+        return confirm(message);
+    }
+    return true;
+}
+
+function updateSingleFileStatusIndicator() {
+    if (isFolderMode) return;
+    const t = translations[currentLang];
+    const baseStatus = fileHandle ? `${t.statusOpened}${fileHandle.name}` : t.statusEmpty;
+    if (isSingleFileModified) {
+        dom.statusMessage.innerHTML = `${baseStatus} <span class="modified-dot" style="display:inline; margin-left:5px;">●</span>`;
+    } else {
+        dom.statusMessage.innerText = baseStatus;
     }
 }
 
-/* Folder Explorer Styles */
-.sidebar-files-list {
-    border-bottom: 1px solid var(--border-color);
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-.sidebar-file-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: var(--text-primary);
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-}
-
-.sidebar-file-item:hover {
-    background-color: #f9fafb;
-    color: var(--primary-color);
-}
-
-.sidebar-file-item.selected {
-    background-color: #eff6ff;
-    color: var(--primary-color);
-    font-weight: 600;
-    border-left-color: var(--primary-color);
-}
-
-.file-icon {
-    flex-shrink: 0;
-    color: var(--text-secondary);
-}
-
-.sidebar-file-item.selected .file-icon {
-    color: var(--primary-color);
-}
-
-.file-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-}
-
-.modified-dot {
-    color: var(--accent-color);
-    font-size: 0.6rem;
-    margin-left: auto;
-}
-
-/* File Tree View */
-.file-tree {
-    width: 100%;
-}
-
-.sidebar-dir-header {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: var(--text-primary);
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-    user-select: none;
-}
-
-.sidebar-dir-header:hover {
-    background-color: #f0f7ff;
-    color: var(--primary-color);
-}
-
-.sidebar-dir-header .dir-arrow {
-    font-size: 0.55rem;
-    width: 12px;
-    flex-shrink: 0;
-    color: var(--text-secondary);
-    transition: transform 0.2s;
-}
-
-.sidebar-dir-header .dir-icon {
-    display: inline-flex;
-    flex-shrink: 0;
-    color: #f59e0b;
-}
-
-.sidebar-dir-header .dir-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 500;
-}
-
-.sidebar-dir-header.drag-over {
-    border-top: 2px solid var(--primary-color);
-    background-color: #f0f7ff;
-}
-
-/* Fallback banner for Firefox */
-.sidebar-fallback-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background-color: #fffbeb;
-    border-bottom: 1px solid #fde68a;
-    font-size: 0.75rem;
-    color: #92400e;
-    line-height: 1.4;
-}
-
-.sidebar-fallback-banner .fallback-icon {
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-/* File item drag states */
-.sidebar-file-item.drag-over {
-    border-top: 2px solid var(--primary-color);
-    background-color: #f0f7ff;
-}
-
-.sidebar-file-item.dragging {
-    opacity: 0.4;
-    background-color: #f3f4f6;
-}
-
-/* Alignement et gestion des actions sur les fichiers/dossiers de la sidebar */
-.sidebar-file-item, .sidebar-dir-header {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    padding-right: 0.5rem;
-}
-
-.sidebar-item-text {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-}
-
-.sidebar-item-text .file-name,
-.sidebar-item-text .dir-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.sidebar-item-actions {
-    display: none;
-    gap: 0.2rem;
-    flex-shrink: 0;
-    margin-left: 0.5rem;
-}
-
-.sidebar-file-item:hover .sidebar-item-actions,
-.sidebar-dir-header:hover .sidebar-item-actions {
-    display: flex;
-}
-
-.sidebar-action-btn {
-    background: none;
-    border: none;
-    padding: 2px;
-    cursor: pointer;
-    color: var(--text-secondary);
-    display: inline-flex;
-    align-items: center;
-    border-radius: 3px;
-    transition: all 0.15s;
-}
-
-.sidebar-action-btn:hover {
-    background-color: #e5e7eb;
-    color: var(--text-primary);
-}
-
-.sidebar-action-btn.delete-btn:hover {
-    color: var(--danger-color);
-    background-color: #fef2f2;
-}
-
-/* --- Rich Text Toolbar --- */
-.md-mode-toggle {
-    display: flex;
-    background: #e5e7eb;
-    border-radius: 4px;
-    padding: 2px;
-    margin-right: 2px;
-    flex-shrink: 0;
-}
-
-.md-mode-btn {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--text-secondary);
-    border-radius: 3px;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.md-mode-btn.active {
-    background: white;
-    color: var(--primary-color);
-    box-shadow: var(--shadow-sm);
-}
-
-#mdToolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 2px;
-    padding: 0.35rem 0.5rem;
-    background: #f9fafb;
-    border: 1px solid var(--border-color);
-    border-bottom: none;
-    border-radius: 0.375rem 0.375rem 0 0;
-}
-
-.md-toolbar-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 30px;
-    height: 30px;
-    padding: 0 0.3rem;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    color: var(--text-primary);
-    transition: all 0.15s;
-    font-family: inherit;
-}
-
-.md-toolbar-btn:hover {
-    background: #e5e7eb;
-    border-color: #d1d5db;
-}
-
-.md-toolbar-btn:active {
-    background: #d1d5db;
-}
-
-.md-toolbar-group {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    flex-wrap: wrap;
-}
-
-.md-toolbar-sep {
-    width: 1px;
-    height: 20px;
-    background: #d1d5db;
-    margin: 0 4px;
-    flex-shrink: 0;
-}
-
-/* When toolbar is visible, adjust textarea border-radius */
-#mdToolbar:not(.hidden) + #contentInput {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-top-color: transparent;
-}
-
-/* --- Markdown Preview Section --- */
-.md-preview-section {
-    margin-top: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.md-preview-header {
-    display: flex;
-    align-items: center;
-    padding: 0.4rem 0.75rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.md-preview-content {
-    padding: 1rem 1.25rem;
-    min-height: 60px;
-    max-height: 350px;
-    overflow-y: auto;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-primary);
-    background: #fcfcfd;
-}
-
-/* Markdown preview typography */
-.md-preview-content h1,
-.md-preview-content h2,
-.md-preview-content h3,
-.md-preview-content h4 {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.md-preview-content h1 { font-size: 1.4rem; }
-.md-preview-content h2 { font-size: 1.2rem; }
-.md-preview-content h3 { font-size: 1.1rem; }
-
-.md-preview-content p {
-    margin: 0.5rem 0;
-}
-
-.md-preview-content strong {
-    font-weight: 600;
-}
-
-.md-preview-content em {
-    font-style: italic;
-}
-
-.md-preview-content code {
-    background: #e5e7eb;
-    padding: 0.15rem 0.3rem;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 0.85rem;
-}
-
-.md-preview-content pre {
-    background: #1f2937;
-    color: #e5e7eb;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    margin: 0.75rem 0;
-}
-
-.md-preview-content pre code {
-    background: transparent;
-    padding: 0;
-    color: inherit;
-    font-size: 0.85rem;
-}
-
-.md-preview-content blockquote {
-    border-left: 4px solid var(--primary-color);
-    margin: 0.75rem 0;
-    padding: 0.5rem 1rem;
-    background: #f3f4f6;
-    color: var(--text-secondary);
-    border-radius: 0 4px 4px 0;
-}
-
-.md-preview-content ul,
-.md-preview-content ol {
-    margin: 0.5rem 0;
-    padding-left: 1.5rem;
-}
-
-.md-preview-content li {
-    margin: 0.25rem 0;
-}
-
-.md-preview-content a {
-    color: var(--primary-color);
-    text-decoration: underline;
-}
-
-.md-preview-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    margin: 0.5rem 0;
-}
-
-.md-preview-content table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 0.75rem 0;
-    font-size: 0.9rem;
-}
-
-.md-preview-content th,
-.md-preview-content td {
-    border: 1px solid var(--border-color);
-    padding: 0.4rem 0.6rem;
-    text-align: left;
-}
-
-.md-preview-content th {
-    background: #f3f4f6;
-    font-weight: 600;
-}
-
-.md-preview-content hr {
-    border: none;
-    border-top: 2px solid var(--border-color);
-    margin: 1rem 0;
-}
-
-.md-preview-content del {
-    text-decoration: line-through;
-    color: var(--text-secondary);
-}
-
-.md-preview-content p:last-child {
-    margin-bottom: 0;
-}
-
-/* ========== UNIFIED EDITOR STYLES ========== */
-
-.unified-editor {
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    background: var(--card-bg);
-    overflow: hidden;
-}
-
-.unified-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.4rem 0.5rem;
-    background: #f9fafb;
-    border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
-}
-
-.unified-format-group,
-.unified-mode-toggle,
-.unified-insert-group {
-    display: flex;
-    align-items: center;
-    gap: 0.15rem;
-}
-
-.unified-toolbar-sep {
-    width: 1px;
-    height: 20px;
-    background: var(--border-color);
-    margin: 0 0.3rem;
-}
-
-.unified-mode-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.15rem;
-}
-
-.unified-editor #contentInput {
-    border: none;
-    border-radius: 0;
-    resize: vertical;
-    min-height: 120px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    padding: 0.75rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.unified-editor #contentInput:focus {
-    outline: none;
-    box-shadow: inset 0 0 0 2px var(--primary-color);
-}
-
-/* Insert Dropdown */
-.insert-dropdown {
-    position: relative;
-}
-
-.insert-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-weight: 500;
-}
-
-.insert-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 0.25rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    box-shadow: var(--shadow-md);
-    z-index: 1001;
-    min-width: 200px;
-    padding: 0.35rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-}
-
-.insert-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.75rem;
-    background: none;
-    border: none;
-    border-radius: 0.25rem;
-    width: 100%;
-    text-align: left;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: background 0.15s;
-}
-
-.insert-menu-item:hover {
-    background: #eff6ff;
-    color: var(--primary-color);
-}
-
-/* Preview Section (always visible) */
-.preview-section {
-    border-top: 1px solid var(--border-color);
-    background: #fafafa;
-}
-
-.preview-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.4rem 0.75rem;
-    background: #f3f4f6;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.preview-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.preview-type-label {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    padding: 0.1rem 0.4rem;
-    border: 1px solid var(--border-color);
-    border-radius: 3px;
-}
-
-.preview-content {
-    padding: 0.75rem;
-    min-height: 60px;
-    max-height: 250px;
-    overflow-y: auto;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: var(--text-primary);
-}
-
-/* Variables Config Panel */
-.vars-config {
-    border-top: 1px solid var(--border-color);
-}
-
-.vars-config-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.4rem 0.75rem;
-    background: #f3f4f6;
-    border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
-    gap: 0.3rem;
-}
-
-.vars-config-header > span:first-child {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.vars-config-hint {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-}
-
-.vars-config-hint code {
-    background: #e5e7eb;
-    padding: 0.05rem 0.3rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-}
-
-/* CARTE INLINE D'ÉDITION DES VARIABLES PLACÉES AU-DESSUS DE L'APERÇU */
-.vars-config-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: #f9fafb;
-    max-height: 320px;
-    overflow-y: auto;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.var-config-row {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.var-config-header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.var-config-name {
-    font-family: monospace;
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--primary-color);
-    background: #eff6ff;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-}
-
-.var-config-type select {
-    font-size: 0.8rem;
-    padding: 0.2rem 0.4rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.25rem;
-    background: white;
-}
-
-.var-config-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.var-config-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.var-field-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.var-config-field input[type="text"],
-.var-config-field textarea {
-    padding: 0.45rem 0.6rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.25rem;
-    font-family: inherit;
-    font-size: 0.85rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.var-config-field textarea {
-    font-family: monospace;
-    resize: vertical;
-}
-
-/* Options for choice/list */
-.var-options-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.var-options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.var-option-row {
-    display: flex;
-    gap: 0.4rem;
-    align-items: center;
-    background: #f9fafb;
-    border: 1px solid var(--border-color);
-    border-radius: 0.25rem;
-    padding: 0.35rem;
-}
-
-.var-option-row input[type="text"] {
-    flex: 1;
-    padding: 0.3rem 0.4rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.2rem;
-    font-size: 0.8rem;
-    min-width: 0;
-}
-
-.var-option-row textarea {
-    flex: 1;
-    padding: 0.3rem 0.4rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.2rem;
-    font-family: monospace;
-    font-size: 0.8rem;
-    resize: vertical;
-    min-height: 1.8rem;
-}
-
-.var-option-remove {
-    flex: 0 0 auto;
-    font-size: 1rem;
-    line-height: 1;
-    padding: 0.1rem 0.3rem;
-    color: var(--text-secondary);
-}
-
-.var-option-remove:hover {
-    color: var(--danger-color);
-}
-
-/* Style de sélection de comportement (hybride / doublons) */
-.behavior-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    background: #f9fafb;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.6rem 0.8rem;
-}
-
-.behavior-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: var(--text-primary);
-    font-weight: normal !important;
-}
-
-.behavior-option input[type="radio"] {
-    margin: 0;
-    cursor: pointer;
-    accent-color: var(--primary-color);
-}
-
-/* Interactive Dual Preview Styles */
-.interactive-preview-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-@media (min-width: 600px) {
-    .interactive-preview-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
+// --- File System Logic ---
+
+async function loadFile() {
+    if (!confirmUnsavedChanges()) return;
+    if (!window.showOpenFilePicker) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.yml,.yaml';
+        input.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                isFolderMode = false;
+                fileHandle = null;
+                isSingleFileModified = false;
+                parseYaml(text);
+                dom.statusMessage.innerText = `${t('statusOpened')}${file.name}`;
+                renderSidebar();
+            } catch (err) {
+                console.error('Error reading file:', err);
+                alert(t('statusErrorLoading'));
+            }
+        });
+        input.click();
+        return;
+    }
+    try {
+        const [handle] = await window.showOpenFilePicker({
+            types: [{ description: 'Espanso YAML Files', accept: { 'text/yaml': ['.yml', '.yaml'] } }],
+        });
+        isFolderMode = false;
+        fileHandle = handle;
+        isSingleFileModified = false;
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        parseYaml(text);
+        dom.statusMessage.innerText = `${t('statusOpened')}${file.name}`;
+    } catch (err) {
+        if (err.name !== 'AbortError') { console.error('Error loading file:', err); alert(t('statusErrorLoading')); }
     }
 }
 
-.preview-form-block,
-.preview-result-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+async function loadFolder() {
+    if (!confirmUnsavedChanges()) return;
+    try {
+        if (!window.showDirectoryPicker) { openFolderFallback(); return; }
+        const dirHandle = await window.showDirectoryPicker();
+        await readDirectory(dirHandle);
+    } catch (err) {
+        if (err.name !== 'AbortError') { console.error('Error loading folder:', err); alert(t('statusErrorLoading')); }
+    }
 }
 
-.preview-sublabel {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.25rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.25rem;
+async function readDirectory(dirHandle) {
+    try {
+        const { files, dirs } = await getFilesAndDirsRecursive(dirHandle);
+        
+        files.sort((a, b) => {
+            const aParts = a.relativePath.split('/');
+            const bParts = b.relativePath.split('/');
+            const aDir = aParts.slice(0, -1).join('/');
+            const bDir = bParts.slice(0, -1).join('/');
+            const aFile = aParts[aParts.length - 1];
+            const bFile = bParts[bParts.length - 1];
+            if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; return aFile.localeCompare(bFile); }
+            if (aDir && !bDir) return -1; if (!aDir && bDir) return 1; return aFile.localeCompare(bFile);
+        });
+
+        folderFiles = [];
+        for (const f of files) {
+            try {
+                const file = await f.handle.getFile();
+                const text = await file.text();
+                let parsedMatches = [];
+                let hasParseError = false;
+                let parseErrorMessage = '';
+                try { 
+                    const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }); 
+                    if (data && data.matches) {
+                        parsedMatches = data.matches; 
+                    } else {
+                        parsedMatches = [];
+                    }
+                } catch (e) { 
+                    console.warn(`Error parsing YAML in ${f.relativePath}:`, e); 
+                    hasParseError = true;
+                    parseErrorMessage = e.message;
+                }
+                folderFiles.push({ 
+                    name: f.relativePath, 
+                    handle: f.handle, 
+                    content: text, 
+                    matches: parsedMatches, 
+                    isModified: false,
+                    hasParseError: hasParseError,
+                    parseErrorMessage: parseErrorMessage
+                });
+            } catch (e) { console.error(`Error reading file ${f.relativePath}:`, e); }
+        }
+
+        folderDirs = dirs.map(d => d.relativePath);
+        currentDirHandle = dirHandle;
+        isFolderMode = true;
+        
+        if (folderFiles.length > 0) {
+            activeFolderFileIndex = -1; // Reset de l'index actif pour éviter le report d'état
+            selectFolderFile(0);
+        } else {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+            renderMatches();
+            updateYamlPreview();
+        }
+        dom.statusMessage.innerText = `${t('statusFolderOpened')}${dirHandle.name}`;
+    } catch (err) {
+        console.error('Error reading directory:', err);
+        alert(t('statusErrorLoading'));
+    }
 }
 
-.preview-form-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.75rem;
+async function getFilesAndDirsRecursive(dirHandle, path = '', depth = 0) {
+    const MAX_DEPTH = 10;
+    if (depth > MAX_DEPTH) { console.warn(`Reached max depth at "${path}"`); return { files: [], dirs: [] }; }
+    let files = [];
+    let dirs = [];
+    for await (const entry of dirHandle.values()) {
+        const relativePath = path ? `${path}/${entry.name}` : entry.name;
+        if (entry.kind === 'file') { 
+            if (entry.name.endsWith('.yml') || entry.name.endsWith('.yaml')) {
+                files.push({ handle: entry, relativePath }); 
+            }
+        } else if (entry.kind === 'directory') { 
+            dirs.push({ handle: entry, relativePath });
+            const sub = await getFilesAndDirsRecursive(entry, relativePath, depth + 1); 
+            files = files.concat(sub.files);
+            dirs = dirs.concat(sub.dirs);
+        }
+    }
+    return { files, dirs };
 }
 
-.preview-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+function openFolderFallback() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.directory = true;
+    input.multiple = true;
+    input.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files).filter(f => f.name.endsWith('.yml') || f.name.endsWith('.yaml'));
+        files.sort((a, b) => {
+            const aPath = a.webkitRelativePath, bPath = b.webkitRelativePath;
+            const aParts = aPath.split('/'), bParts = bPath.split('/');
+            aParts.shift(); bParts.shift();
+            const aDir = aParts.slice(0, -1).join('/'), bDir = bParts.slice(0, -1).join('/');
+            const aFile = aParts[aParts.length - 1], bFile = bParts[bParts.length - 1];
+            if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; return aFile.localeCompare(bFile); }
+            if (aDir && !bDir) return -1; if (!aDir && bDir) return 1; return aFile.localeCompare(bFile);
+        });
+        
+        folderFiles = [];
+        const detectedDirs = new Set();
+        for (const file of files) {
+            try {
+                const text = await file.text();
+                let parsedMatches = [];
+                let hasParseError = false;
+                let parseErrorMessage = '';
+                try { 
+                    const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }); 
+                    if (data && data.matches) {
+                        parsedMatches = data.matches; 
+                    } else {
+                        parsedMatches = [];
+                    }
+                } catch (err) { 
+                    console.warn(`Error parsing YAML in ${file.webkitRelativePath}:`, err); 
+                    hasParseError = true;
+                    parseErrorMessage = err.message;
+                }
+                const parts = file.webkitRelativePath.split('/'); parts.shift();
+                const relativePath = parts.join('/') || file.name;
+                
+                for (let i = 1; i < parts.length; i++) {
+                    detectedDirs.add(parts.slice(0, i).join('/'));
+                }
+                
+                folderFiles.push({ 
+                    name: relativePath, 
+                    handle: null, 
+                    fileObject: file, 
+                    content: text, 
+                    matches: parsedMatches, 
+                    isModified: false,
+                    hasParseError: hasParseError,
+                    parseErrorMessage: parseErrorMessage
+                });
+            } catch (err) { console.error(`Error reading file ${file.name}:`, err); }
+        }
+        
+        folderDirs = Array.from(detectedDirs);
+        isFolderMode = true;
+        
+        if (folderFiles.length > 0) {
+            activeFolderFileIndex = -1;
+            selectFolderFile(0);
+        } else {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+            renderMatches();
+            updateYamlPreview();
+        }
+        const rootFolder = e.target.files[0]?.webkitRelativePath.split('/')[0] || 'Dossier';
+        dom.statusMessage.innerText = `${t('statusFolderOpened')}${rootFolder}`;
+    });
+    input.click();
 }
 
-.preview-form-group label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    font-family: monospace;
-    color: var(--primary-color);
-    margin-bottom: 0.1rem;
+function selectFolderFile(index) {
+    if (index < 0 || index >= folderFiles.length) return;
+    
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length && activeFolderFileIndex !== index) {
+        const oldFile = folderFiles[activeFolderFileIndex];
+        if (!oldFile.hasParseError) {
+            oldFile.matches = [...currentMatches];
+            oldFile.content = generateYaml();
+        }
+    }
+    
+    activeFolderFileIndex = index;
+    const activeFile = folderFiles[index];
+    currentMatches = [...activeFile.matches];
+    fileHandle = activeFile.handle;
+    
+    renderMatches();
+    
+    if (activeFile.hasParseError) {
+        dom.yamlEditor.value = activeFile.content;
+    } else {
+        updateYamlPreview();
+    }
 }
 
-.preview-form-input {
-    width: 100%;
-    padding: 0.4rem 0.5rem;
-    font-size: 0.85rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: #fafafa;
-    color: var(--text-primary);
-    font-family: inherit;
-    box-sizing: border-box;
+function markActiveFileAsModified() {
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        folderFiles[activeFolderFileIndex].isModified = true;
+        renderSidebar();
+    } else if (!isFolderMode) {
+        isSingleFileModified = true;
+        updateSingleFileStatusIndicator();
+    }
 }
 
-.preview-form-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background-color: #ffffff;
+async function saveFile(btn = dom.btnSave) {
+    if (!fileHandle) { saveFileAs(btn); return; }
+    if (isFolderMode) {
+        const fileName = fileHandle.name || 'fichier';
+        if (!confirm(`Vous allez écraser le fichier original "${fileName}". Confirmer ?`)) return;
+    }
+    try {
+        const writable = await fileHandle.createWritable();
+        
+        let yamlContent;
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            if (activeFile.hasParseError) {
+                yamlContent = dom.yamlEditor.value;
+            } else {
+                yamlContent = generateYaml();
+            }
+        } else {
+            yamlContent = generateYaml();
+        }
+        
+        await writable.write(yamlContent);
+        await writable.close();
+        
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            activeFile.isModified = false;
+            activeFile.content = yamlContent;
+            
+            try {
+                const data = jsyaml.load(yamlContent, { schema: jsyaml.CORE_SCHEMA });
+                if (data && data.matches) {
+                    activeFile.matches = data.matches;
+                    activeFile.hasParseError = false;
+                    activeFile.parseErrorMessage = '';
+                    currentMatches = [...activeFile.matches];
+                }
+            } catch (e) {
+                activeFile.hasParseError = true;
+                activeFile.parseErrorMessage = e.message;
+            }
+            
+            renderSidebar();
+            renderMatches();
+        } else if (!isFolderMode) {
+            isSingleFileModified = false;
+            updateSingleFileStatusIndicator();
+        }
+        
+        dom.statusMessage.innerText = `${t('statusOpened')}${fileHandle.name} (${new Date().toLocaleTimeString()})`;
+        showFeedback(btn, 'statusSavedShort');
+    } catch (err) { console.error('Error saving file:', err); alert(t('statusErrorSaving')); }
 }
 
-.preview-result-text {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.75rem;
-    min-height: 100px;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: var(--text-primary);
-    font-family: monospace;
+async function saveFileAs(btn = dom.btnSaveAs) {
+    const yamlContent = generateYaml();
+    let fileName = 'match.yml';
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        const pathParts = folderFiles[activeFolderFileIndex].name.split('/');
+        fileName = pathParts[pathParts.length - 1];
+    } else if (fileHandle) { fileName = fileHandle.name; }
+    if (!window.showSaveFilePicker) {
+        try {
+            const blob = new Blob([yamlContent], { type: 'text/yaml;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a'); link.href = url; link.download = fileName;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+            if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+                folderFiles[activeFolderFileIndex].isModified = false;
+                folderFiles[activeFolderFileIndex].content = yamlContent;
+                renderSidebar();
+            }
+            dom.statusMessage.innerText = `${t('statusSaved')} : ${fileName}`;
+            showFeedback(btn, 'statusSavedShort');
+        } catch (err) { console.error('Error downloading file:', err); alert(t('statusErrorSaving')); }
+        return;
+    }
+    try {
+        const handle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [{ description: 'Espanso YAML File', accept: { 'text/yaml': ['.yml'] } }],
+        });
+        fileHandle = handle;
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            folderFiles[activeFolderFileIndex].handle = handle;
+            folderFiles[activeFolderFileIndex].name = handle.name;
+        }
+        await saveFile(btn);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error saving file:', err); alert(t('statusErrorSaving')); } }
 }
 
-/* --- Error state inside matches list --- */
-.error-state {
-    background-color: #fef2f2;
-    border: 1px solid #fca5a5;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    color: #991b1b;
+// --- Data Parsing/Generation ---
+
+function parseYaml(text) {
+    try {
+        const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA });
+        if (data && data.matches) { currentMatches = data.matches; } else { currentMatches = []; }
+        renderMatches();
+        updateYamlPreview();
+    } catch (e) { alert(t('statusErrorLoading') + ' : ' + e.message); }
 }
 
-.error-state-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+function generateYaml() {
+    const data = { matches: currentMatches };
+    const header = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+    if (!currentMatches || currentMatches.length === 0) return header;
+    const yamlBody = jsyaml.dump(data.matches, { indent: 2, lineWidth: -1, quotingType: '"', noRefs: true });
+    const indentedBody = yamlBody.split('\n').map(line => line ? '  ' + line : line).join('\n');
+    return header + indentedBody;
 }
 
-.error-state-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+// --- Drag and Drop Logic ---
+let draggedIndex = null;
+
+function handleDragStart(e, index) { draggedIndex = index; e.dataTransfer.effectAllowed = 'move'; e.target.classList.add('dragging'); }
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const t = e.target.closest('.sidebar-item'); if (t) t.classList.add('drag-over'); }
+function handleDragLeave(e) { const t = e.target.closest('.sidebar-item'); if (t) t.classList.remove('drag-over'); }
+function handleDrop(e, targetIndex) {
+    e.preventDefault(); const t = e.target.closest('.sidebar-item'); if (t) t.classList.remove('drag-over');
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+    const item = currentMatches.splice(draggedIndex, 1)[0]; currentMatches.splice(targetIndex, 0, item);
+    markActiveFileAsModified(); renderMatches(targetIndex); updateYamlPreview();
+}
+function handleDragEnd(e) { e.target.classList.remove('dragging'); draggedIndex = null; }
+
+function sortMatchesAlphabetically() {
+    if (!currentMatches || currentMatches.length < 2) return;
+    sortDirection = sortDirection === 1 ? -1 : 1;
+    currentMatches.sort((a, b) => { return (a.trigger || "").toLowerCase().localeCompare((b.trigger || "").toLowerCase()) * sortDirection; });
+    updateSortButtonIcon(); markActiveFileAsModified(); renderMatches(); updateYamlPreview();
 }
 
-.error-icon {
-    font-size: 1.25rem;
+function sortFilesAlphabetically() {
+    if (!isFolderMode || folderFiles.length < 2) return;
+    fileSortDirection = fileSortDirection === 1 ? -1 : 1;
+    updateFileSortButtonIcon(); renderSidebar();
 }
 
-.error-desc {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin: 0 0 1rem 0;
-    color: #7f1d1d;
+// --- File Tree & Drag Logic ---
+function saveExpandedState(node, parentPath) {
+    if (node.children) { for (const dirName of Object.keys(node.children)) { const dirPath = parentPath ? parentPath + '/' + dirName : dirName; expandedFolders[dirPath] = node.children[dirName].expanded; saveExpandedState(node.children[dirName], dirPath); } }
+}
+function buildFileTree(fileList) {
+    const root = { children: {}, files: [] };
+    
+    if (Array.isArray(folderDirs)) {
+        folderDirs.forEach(dirPath => {
+            const parts = dirPath.split('/');
+            let current = root;
+            for (let i = 0; i < parts.length; i++) {
+                const dirName = parts[i];
+                if (!current.children[dirName]) {
+                    const currentPath = parts.slice(0, i + 1).join('/');
+                    const savedExpanded = expandedFolders[currentPath];
+                    current.children[dirName] = {
+                        name: dirName,
+                        parent: current,
+                        children: {},
+                        files: [],
+                        expanded: savedExpanded !== undefined ? savedExpanded : true
+                    };
+                }
+                current = current.children[dirName];
+            }
+        });
+    }
+
+    const sorted = [...fileList].sort((a, b) => {
+        const aParts = a.name.split('/'), bParts = b.name.split('/');
+        const aDir = aParts.slice(0, -1).join('/'), bDir = bParts.slice(0, -1).join('/');
+        if (aDir && !bDir) return -1; if (!aDir && bDir) return 1;
+        if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; }
+        return (aParts[aParts.length - 1] || '').localeCompare((bParts[bParts.length - 1] || '')) * fileSortDirection;
+    });
+
+    sorted.forEach(file => {
+        const parts = file.name.split('/');
+        if (parts.length === 1) {
+            root.files.push(file);
+        } else {
+            let current = root;
+            for (let i = 0; i < parts.length - 1; i++) {
+                const dirName = parts[i];
+                if (!current.children[dirName]) {
+                    const dirPath = parts.slice(0, i + 1).join('/');
+                    const savedExpanded = expandedFolders[dirPath];
+                    current.children[dirName] = { 
+                        name: dirName, 
+                        parent: current, 
+                        children: {}, 
+                        files: [], 
+                        expanded: savedExpanded !== undefined ? savedExpanded : true 
+                    };
+                }
+                current = current.children[dirName];
+            }
+            current.files.push(file);
+        }
+    });
+    return root;
+}
+let fileDragData = null;
+
+function handleFileDragStart(e, fileIndex) { fileDragData = { index: fileIndex }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'file'); e.target.classList.add('dragging'); }
+function handleFileDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.add('drag-over'); }
+function handleFileDragLeave(e) { const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.remove('drag-over'); }
+function handleFileDrop(e, targetFileIndex) {
+    e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
+    if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
+    if (fileDragData.index === targetFileIndex) { fileDragData = null; return; }
+    const sourceFile = folderFiles[fileDragData.index], targetFile = folderFiles[targetFileIndex];
+    if (!sourceFile || !targetFile) { fileDragData = null; return; }
+    const targetParts = targetFile.name.split('/'); const targetDir = targetParts.slice(0, -1).join('/');
+    moveFileToDirectory(sourceFile, targetDir);
+}
+async function handleFileDropOnDir(e, dirPath) {
+    e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
+    if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
+    const sourceFile = folderFiles[fileDragData.index]; if (!sourceFile) { fileDragData = null; return; }
+    moveFileToDirectory(sourceFile, dirPath);
+}
+function fileDragEnd(e) { e.target.classList.remove('dragging'); fileDragData = null; }
+async function moveFileToDirectory(sourceFile, targetDirPath) {
+    const sourceName = sourceFile.name.split('/').pop();
+    const sourceDir = sourceFile.name.split('/').slice(0, -1).join('/');
+    if (sourceDir === targetDirPath) { fileDragData = null; return; }
+    if (!confirm(`${currentLang === 'fr' ? 'Déplacer ce fichier ?' : 'Move this file?'}\n"${sourceName}" → ${targetDirPath || '(racine)'}`)) { fileDragData = null; return; }
+    try {
+        const sourcePathParts = sourceFile.name.split('/'); let sourceDirHandle = currentDirHandle;
+        for (let i = 0; i < sourcePathParts.length - 1; i++) sourceDirHandle = await sourceDirHandle.getDirectoryHandle(sourcePathParts[i]);
+        const fileHandleToMove = sourceFile.handle;
+        let destDirHandle = currentDirHandle;
+        if (targetDirPath) { const dirParts = targetDirPath.split('/'); for (const dirPart of dirParts) destDirHandle = await destDirHandle.getDirectoryHandle(dirPart, { create: true }); }
+        try { await destDirHandle.getFileHandle(sourceName); if (!confirm(`${currentLang === 'fr' ? 'Le fichier existe déjà. Remplacer ?' : 'File already exists. Overwrite?'}`)) { fileDragData = null; return; } } catch (e) {}
+        await fileHandleToMove.move(destDirHandle, sourceName);
+        await readDirectory(currentDirHandle);
+    } catch (err) { console.error('Error moving file:', err); alert(t('errorCreatingFile') + ': ' + err.message); }
+    fileDragData = null;
 }
 
-.error-log {
-    background-color: #111827;
-    color: #f9fafb;
-    padding: 0.75rem 1rem;
-    border-radius: 0.375rem;
-    font-family: monospace;
-    font-size: 0.8rem;
-    overflow-x: auto;
-    margin: 0;
-    white-space: pre-wrap;
-    border: 1px solid #374151;
+function updateFileSortButtonIcon() {
+    if (!dom.btnSortFiles) return;
+    const svgArrow = fileSortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+    dom.btnSortFiles.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgArrow}</svg>`;
 }
 
-/* Parse error indicator in sidebar */
-.parse-error-indicator {
-    color: var(--danger-color);
-    font-size: 0.8rem;
-    cursor: help;
-}
-/* Variable Options Collapsible states */
-.var-options-header-title {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+function updateSortButtonIcon() {
+    if (!dom.btnSortAlpha) return;
+    const svgArrow = sortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+    dom.btnSortAlpha.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgArrow}</svg>`;
+    dom.btnSortAlpha.title = sortDirection === 1 ? t('btnSortAlpha') : (currentLang === 'fr' ? 'Trier Z-A' : 'Sort Z-A');
 }
 
-.var-options-field.collapsed .var-options-list {
-    display: none !important;
+// Résout récursivement un handle de sous-dossier à partir de son chemin virtuel
+async function getDirHandleFromPath(dirPath) {
+    if (!dirPath) return currentDirHandle;
+    const parts = dirPath.split('/');
+    let current = currentDirHandle;
+    for (const part of parts) {
+        if (part) {
+            current = await current.getDirectoryHandle(part);
+        }
+    }
+    return current;
 }
 
-.var-options-field.collapsed .toggle-icon {
-    transform: rotate(-90deg);
+async function renameFile(fileIndex) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const fileObj = folderFiles[fileIndex];
+    const oldName = fileObj.name.split('/').pop();
+    const newName = prompt(currentLang === 'fr' ? "Nouveau nom du fichier :" : "New file name:", oldName);
+    if (!newName || newName === oldName) return;
+    
+    let finalName = newName;
+    if (!finalName.endsWith('.yml') && !finalName.endsWith('.yaml')) {
+        finalName += '.yml';
+    }
+    
+    try {
+        await fileObj.handle.move(finalName);
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error renaming file:", err);
+        alert(currentLang === 'fr' ? "Erreur lors du renommage du fichier." : "Error renaming file.");
+    }
 }
+
+async function deleteFile(fileIndex) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const fileObj = folderFiles[fileIndex];
+    const name = fileObj.name.split('/').pop();
+    if (!confirm(currentLang === 'fr' ? `Supprimer définitivement le fichier "${name}" ?` : `Permanently delete file "${name}"?`)) return;
+    
+    try {
+        if (typeof fileObj.handle.remove === 'function') {
+            await fileObj.handle.remove();
+        } else {
+            const pathParts = fileObj.name.split('/');
+            const parentPath = pathParts.slice(0, -1).join('/');
+            const parentHandle = await getDirHandleFromPath(parentPath);
+            await parentHandle.removeEntry(pathParts[pathParts.length - 1]);
+        }
+        
+        if (activeFolderFileIndex === fileIndex) {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+        }
+        
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error deleting file:", err);
+        alert(currentLang === 'fr' ? "Erreur lors de la suppression." : "Error deleting file.");
+    }
+}
+
+// Vérifie si un dossier est vide
+async function isDirEmpty(dirHandle) {
+    for await (const entry of dirHandle.values()) {
+        return false; // Contient au moins un élément
+    }
+    return true; // Dossier vide
+}
+
+// Copie récursivement le contenu d'un répertoire source vers un répertoire cible
+async function copyDirectoryHelper(sourceHandle, targetHandle) {
+    for await (const entry of sourceHandle.values()) {
+        if (entry.kind === 'file') {
+            const file = await entry.getFile();
+            const newFileHandle = await targetHandle.getFileHandle(entry.name, { create: true });
+            const writable = await newFileHandle.createWritable();
+            await writable.write(file);
+            await writable.close();
+        } else if (entry.kind === 'directory') {
+            const newDirHandle = await targetHandle.getDirectoryHandle(entry.name, { create: true });
+            const subSourceHandle = await sourceHandle.getDirectoryHandle(entry.name);
+            await copyDirectoryHelper(subSourceHandle, newDirHandle);
+        }
+    }
+}
+
+// Fonction de suppression de dossier mise à jour avec vérification de contenu
+async function deleteFolder(dirPath) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const parts = dirPath.split('/');
+    const dirName = parts[parts.length - 1];
+    
+    try {
+        const dirHandle = await getDirHandleFromPath(dirPath);
+        const isEmpty = await isDirEmpty(dirHandle);
+        
+        let confirmationMessage = "";
+        if (!isEmpty) {
+            confirmationMessage = currentLang === 'fr' 
+                ? `⚠️ Le dossier "${dirName}" n'est pas vide. Voulez-vous vraiment supprimer ce dossier et TOUT son contenu ?`
+                : `⚠️ The folder "${dirName}" is not empty. Do you really want to delete this folder and ALL its contents?`;
+        } else {
+            confirmationMessage = currentLang === 'fr'
+                ? `Supprimer le dossier vide "${dirName}" ?`
+                : `Delete empty folder "${dirName}"?`;
+        }
+        
+        if (!confirm(confirmationMessage)) return;
+        
+        const parentPath = parts.slice(0, -1).join('/');
+        const parentHandle = await getDirHandleFromPath(parentPath);
+        await parentHandle.removeEntry(dirName, { recursive: true });
+        
+        // Réinitialise la sélection active si le fichier en cours d'édition était dans le dossier supprimé
+        if (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            if (activeFile.name.startsWith(dirPath + '/')) {
+                activeFolderFileIndex = -1;
+                currentMatches = [];
+                fileHandle = null;
+            }
+        }
+        
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error deleting folder:", err);
+        alert(currentLang === 'fr' ? "Erreur lors de la suppression du dossier." : "Error deleting folder.");
+    }
+}
+
+// Fonction de renommage de dossier mise à jour avec contournement pour Chrome
+async function renameFolder(dirPath) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const parts = dirPath.split('/');
+    const oldName = parts[parts.length - 1];
+    const parentPath = parts.slice(0, -1).join('/');
+    
+    const newName = prompt(currentLang === 'fr' ? "Nouveau nom du dossier :" : "New folder name:", oldName);
+    if (!newName || newName === oldName) return;
+    if (!/^[a-zA-Z0-9_\- ]+$/.test(newName)) {
+        alert(currentLang === 'fr' ? "Nom de dossier invalide." : "Invalid folder name.");
+        return;
+    }
+
+    try {
+        const parentHandle = await getDirHandleFromPath(parentPath);
+        const sourceHandle = await getDirHandleFromPath(dirPath);
+        
+        // 1. Crée le dossier cible avec le nouveau nom
+        const targetHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
+        
+        // 2. Copie récursivement tout le contenu
+        await copyDirectoryHelper(sourceHandle, targetHandle);
+        
+        // 3. Supprime l'ancien répertoire
+        await parentHandle.removeEntry(oldName, { recursive: true });
+        
+        // 4. Mémorise le chemin relatif du fichier ouvert actuellement
+        let activeRelPath = "";
+        if (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            activeRelPath = folderFiles[activeFolderFileIndex].name;
+        }
+        
+        // 5. Met à jour l'arbre de fichiers
+        await readDirectory(currentDirHandle);
+        
+        // 6. Restaure la sélection active si elle faisait partie du dossier renommé
+        if (activeRelPath) {
+            const oldPrefix = dirPath + '/';
+            const newPrefix = parentPath ? `${parentPath}/${newName}/` : `${newName}/`;
+            if (activeRelPath.startsWith(oldPrefix)) {
+                const updatedRelPath = activeRelPath.replace(oldPrefix, newPrefix);
+                const newIdx = folderFiles.findIndex(f => f.name === updatedRelPath);
+                if (newIdx !== -1) {
+                    selectFolderFile(newIdx);
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Error renaming folder:", err);
+        alert(currentLang === 'fr' ? "Erreur lors du renommage du dossier." : "Error renaming folder.");
+    }
+}
+
+// --- UI Rendering ---
+
+function renderMatches(highlightIndex = -1) {
+    dom.matchesList.innerHTML = '';
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        const activeFile = folderFiles[activeFolderFileIndex];
+        
+        if (activeFile.hasParseError) {
+            dom.matchesList.innerHTML = `
+                <div class="error-state">
+                    <div class="error-state-header">
+                        <span class="error-icon">⚠️</span>
+                        <h3>Erreur de lecture YAML</h3>
+                    </div>
+                    <p class="error-desc">Ce fichier contient des erreurs de syntaxe ou un format non supporté par l'éditeur visuel. Vous pouvez le corriger manuellement dans l'éditeur de texte à droite.</p>
+                    <pre class="error-log">${escapeHtml(activeFile.parseErrorMessage)}</pre>
+                </div>
+            `;
+            renderSidebar(highlightIndex);
+            return;
+        }
+        
+        activeFile.matches = currentMatches;
+    }
+    
+    renderSidebar(highlightIndex);
+    if (!currentMatches || currentMatches.length === 0) {
+        dom.matchesList.innerHTML = `<div class="empty-state"><p>${t('noMatchesFound')}</p></div>`;
+        return;
+    }
+    currentMatches.forEach((match, index) => {
+        const card = createMatchCard(match, index);
+        if (index === highlightIndex) card.classList.add('selected');
+        dom.matchesList.appendChild(card);
+    });
+    if (highlightIndex !== -1) {
+        const selectedEl = dom.matchesList.children[highlightIndex];
+        if (selectedEl) selectedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function renderSidebar(highlightIndex = -1) {
+    if (!dom.sidebarList) return;
+    dom.sidebarList.innerHTML = '';
+    if (isFolderMode) {
+        const filesHeader = document.createElement('div'); filesHeader.className = 'sidebar-section-header';
+        const filesHeaderLabel = document.createElement('span'); filesHeaderLabel.innerText = t('sidebarFiles'); filesHeader.appendChild(filesHeaderLabel);
+        const fileSortBtn = document.createElement('button'); fileSortBtn.className = 'btn-icon sort-file-btn';
+        fileSortBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path></svg>`;
+        fileSortBtn.title = currentLang === 'fr' ? 'Trier les fichiers' : 'Sort files';
+        fileSortBtn.addEventListener('click', (e) => { e.stopPropagation(); sortFilesAlphabetically(); });
+        filesHeader.appendChild(fileSortBtn);
+        dom.btnSortFiles = fileSortBtn;
+        dom.sidebarList.appendChild(filesHeader);
+        if (!supportsFileSystemAPI) {
+            const fallbackBanner = document.createElement('div'); fallbackBanner.className = 'sidebar-fallback-banner';
+            fallbackBanner.innerHTML = `<span class="fallback-icon">💡</span> ${currentLang === 'fr' ? 'Pour gérer les fichiers, utilisez Chrome ou Edge.' : 'To manage files, use Chrome or Edge.'}`;
+            dom.sidebarList.appendChild(fallbackBanner);
+        }
+        const filesContainer = document.createElement('div'); filesContainer.className = 'sidebar-files-list';
+        const tree = buildFileTree(folderFiles); const treeEl = document.createElement('div'); treeEl.className = 'file-tree';
+
+        function renderTreeNode(node, level = 0) {
+            const sortedDirNames = Object.keys(node.children).sort((a, b) => a.localeCompare(b) * fileSortDirection);
+            sortedDirNames.forEach(dirName => {
+                const dir = node.children[dirName]; const dirEl = document.createElement('div'); dirEl.className = 'sidebar-dir-header';
+                dirEl.style.paddingLeft = `${8 + level * 16}px`; dirEl.title = dirName;
+                
+                // Wrapper de texte pour l'alignement
+                const textWrapper = document.createElement('div');
+                textWrapper.className = 'sidebar-item-text';
+                
+                const arrowSpan = document.createElement('span'); arrowSpan.className = 'dir-arrow'; arrowSpan.innerText = dir.expanded ? '▼' : '▶'; textWrapper.appendChild(arrowSpan);
+                const folderIcon = document.createElement('span'); folderIcon.className = 'dir-icon'; folderIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`; textWrapper.appendChild(folderIcon);
+                const dirNameSpan = document.createElement('span'); dirNameSpan.className = 'dir-name'; dirNameSpan.innerText = dirName; textWrapper.appendChild(dirNameSpan);
+                dirEl.appendChild(textWrapper);
+
+                const getFullDirPath = (d) => { const parts = []; let cur = d; while (cur.name) { parts.unshift(cur.name); cur = cur.parent; } return parts.join('/'); };
+                const dirFullPath = getFullDirPath(dir);
+
+                // Ajout des boutons d'action du dossier (Renommer / Supprimer)
+                if (supportsFileSystemAPI) {
+                    const actionWrapper = document.createElement('div');
+                    actionWrapper.className = 'sidebar-item-actions';
+                    
+                    const renameBtn = document.createElement('button');
+                    renameBtn.className = 'sidebar-action-btn';
+                    renameBtn.innerHTML = '✏️';
+                    renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                    renameBtn.onclick = (e) => { e.stopPropagation(); renameFolder(dirFullPath); };
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'sidebar-action-btn delete-btn';
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                    deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFolder(dirFullPath); };
+                    
+                    actionWrapper.appendChild(renameBtn);
+                    actionWrapper.appendChild(deleteBtn);
+                    dirEl.appendChild(actionWrapper);
+                    
+                    dirEl.addEventListener('dragover', handleFileDragOver); 
+                    dirEl.addEventListener('dragleave', handleFileDragLeave); 
+                    dirEl.addEventListener('drop', (e) => handleFileDropOnDir(e, dirFullPath)); 
+                }
+
+                dirEl.onclick = (e) => { e.stopPropagation(); dir.expanded = !dir.expanded; expandedFolders[dirFullPath] = dir.expanded; renderSidebar(highlightIndex); };
+                treeEl.appendChild(dirEl);
+                if (dir.expanded) {
+                    dir.files.forEach(f => {
+                        const fileIndexInFolderFiles = folderFiles.indexOf(f); if (fileIndexInFolderFiles === -1) return;
+                        const item = document.createElement('div'); item.className = 'sidebar-file-item'; if (fileIndexInFolderFiles === activeFolderFileIndex) item.classList.add('selected');
+                        item.style.paddingLeft = `${8 + (level + 1) * 16}px`;
+                        
+                        const fileTextWrapper = document.createElement('div');
+                        fileTextWrapper.className = 'sidebar-item-text';
+                        
+                        fileTextWrapper.innerHTML = `<svg class="file-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+                        const nameSpan = document.createElement('span'); nameSpan.className = 'file-name'; nameSpan.innerText = f.name.split('/').pop(); fileTextWrapper.appendChild(nameSpan);
+                        
+                        if (f.hasParseError) {
+                            const errIndicator = document.createElement('span');
+                            errIndicator.className = 'parse-error-indicator';
+                            errIndicator.innerText = ' ⚠️';
+                            errIndicator.title = f.parseErrorMessage;
+                            fileTextWrapper.appendChild(errIndicator);
+                        }
+                        
+                        if (f.isModified) { const modIndicator = document.createElement('span'); modIndicator.className = 'modified-dot'; modIndicator.innerText = '●'; fileTextWrapper.appendChild(modIndicator); }
+                        item.appendChild(fileTextWrapper);
+
+                        // Actions du fichier (Renommer / Supprimer)
+                        if (supportsFileSystemAPI) {
+                            const actionWrapper = document.createElement('div');
+                            actionWrapper.className = 'sidebar-item-actions';
+                            
+                            const renameBtn = document.createElement('button');
+                            renameBtn.className = 'sidebar-action-btn';
+                            renameBtn.innerHTML = '✏️';
+                            renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                            renameBtn.onclick = (e) => { e.stopPropagation(); renameFile(fileIndexInFolderFiles); };
+                            
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'sidebar-action-btn delete-btn';
+                            deleteBtn.innerHTML = '🗑️';
+                            deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                            deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFile(fileIndexInFolderFiles); };
+                            
+                            actionWrapper.appendChild(renameBtn);
+                            actionWrapper.appendChild(deleteBtn);
+                            item.appendChild(actionWrapper);
+                            
+                            item.draggable = true; 
+                            item.addEventListener('dragstart', (e) => handleFileDragStart(e, fileIndexInFolderFiles)); 
+                            item.addEventListener('dragend', fileDragEnd); 
+                            item.addEventListener('dragover', handleFileDragOver); 
+                            item.addEventListener('dragleave', handleFileDragLeave); 
+                            item.addEventListener('drop', (e) => handleFileDrop(e, fileIndexInFolderFiles)); 
+                        }
+
+                        item.onclick = (e) => { e.stopPropagation(); selectFolderFile(fileIndexInFolderFiles); };
+                        treeEl.appendChild(item);
+                    });
+                    renderTreeNode(dir, level + 1);
+                }
+            });
+            if (level === 0) {
+                node.files.forEach(f => {
+                    const fileIndexInFolderFiles = folderFiles.indexOf(f); if (fileIndexInFolderFiles === -1) return;
+                    const item = document.createElement('div'); item.className = 'sidebar-file-item'; if (fileIndexInFolderFiles === activeFolderFileIndex) item.classList.add('selected');
+                    item.style.paddingLeft = `${8}px`;
+                    
+                    const fileTextWrapper = document.createElement('div');
+                    fileTextWrapper.className = 'sidebar-item-text';
+                    
+                    fileTextWrapper.innerHTML = `<svg class="file-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+                    const nameSpan = document.createElement('span'); nameSpan.className = 'file-name'; nameSpan.innerText = f.name; fileTextWrapper.appendChild(nameSpan);
+                    
+                    if (f.hasParseError) {
+                        const errIndicator = document.createElement('span');
+                        errIndicator.className = 'parse-error-indicator';
+                        errIndicator.innerText = ' ⚠️';
+                        errIndicator.title = f.parseErrorMessage;
+                        fileTextWrapper.appendChild(errIndicator);
+                    }
+                    
+                    if (f.isModified) { const modIndicator = document.createElement('span'); modIndicator.className = 'modified-dot'; modIndicator.innerText = '●'; fileTextWrapper.appendChild(modIndicator); }
+                    item.appendChild(fileTextWrapper);
+
+                    // Actions du fichier racine (Renommer / Supprimer)
+                    if (supportsFileSystemAPI) {
+                        const actionWrapper = document.createElement('div');
+                        actionWrapper.className = 'sidebar-item-actions';
+                        
+                        const renameBtn = document.createElement('button');
+                        renameBtn.className = 'sidebar-action-btn';
+                        renameBtn.innerHTML = '✏️';
+                        renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                        renameBtn.onclick = (e) => { e.stopPropagation(); renameFile(fileIndexInFolderFiles); };
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'sidebar-action-btn delete-btn';
+                        deleteBtn.innerHTML = '🗑️';
+                        deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                        deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFile(fileIndexInFolderFiles); };
+                        
+                        actionWrapper.appendChild(renameBtn);
+                        actionWrapper.appendChild(deleteBtn);
+                        item.appendChild(actionWrapper);
+                        
+                        item.draggable = true; 
+                        item.addEventListener('dragstart', (e) => handleFileDragStart(e, fileIndexInFolderFiles)); 
+                        item.addEventListener('dragend', fileDragEnd); 
+                        item.addEventListener('dragover', handleFileDragOver); 
+                        item.addEventListener('dragleave', handleFileDragLeave); 
+                        item.addEventListener('drop', (e) => handleFileDrop(e, fileIndexInFolderFiles)); 
+                    }
+
+                    item.onclick = (e) => { e.stopPropagation(); selectFolderFile(fileIndexInFolderFiles); };
+                    treeEl.appendChild(item);
+                });
+            }
+        }
+        renderTreeNode(tree, 0);
+        filesContainer.appendChild(treeEl);
+        dom.sidebarList.appendChild(filesContainer);
+        
+        // Triggers section
+        const triggersHeader = document.createElement('div'); triggersHeader.className = 'sidebar-section-header';
+        const triggersHeaderLabel = document.createElement('span'); triggersHeaderLabel.innerText = t('sidebarTriggers'); triggersHeader.appendChild(triggersHeaderLabel);
+        const matchSortBtn = document.createElement('button'); matchSortBtn.className = 'btn-icon sort-match-btn';
+        const initArrow = sortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+        matchSortBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${initArrow}</svg>`;
+        matchSortBtn.title = t('btnSortAlpha');
+        matchSortBtn.addEventListener('click', (e) => { e.stopPropagation(); sortMatchesAlphabetically(); });
+        triggersHeader.appendChild(matchSortBtn);
+        dom.btnSortAlpha = matchSortBtn;
+        dom.sidebarList.appendChild(triggersHeader);
+    }
+    if (!currentMatches || currentMatches.length === 0) return;
+    const triggersContainer = document.createElement('div'); triggersContainer.className = 'sidebar-triggers-list';
+    currentMatches.forEach((match, index) => {
+        const item = document.createElement('div'); item.className = 'sidebar-item'; item.draggable = true;
+        if (index === highlightIndex) item.classList.add('selected');
+        item.innerText = match.trigger || `(Match ${index + 1})`; item.title = match.trigger;
+        item.onclick = (e) => { e.stopPropagation(); renderMatches(index); };
+        item.addEventListener('dragstart', (e) => handleDragStart(e, index)); item.addEventListener('dragover', handleDragOver); item.addEventListener('dragleave', handleDragLeave); item.addEventListener('drop', (e) => handleDrop(e, index)); item.addEventListener('dragend', handleDragEnd);
+        triggersContainer.appendChild(item);
+    });
+    dom.sidebarList.appendChild(triggersContainer);
+}
+
+function createMatchCard(match, index) {
+    const el = document.createElement('div'); el.className = 'match-card'; el.onclick = () => openEditor(index);
+    let type = t('typeSimple');
+    let contentPreview = match.replace;
+
+    if (match.markdown || match.html) {
+        type = t('typeRich');
+        contentPreview = match.replace;
+    } else if (match.form) {
+        type = t('typeInteractive');
+        contentPreview = match.form.replace(/\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g, '{{$1}}');
+    } else if (match.vars) {
+        const formVar = match.vars.find(v => v.type === 'form');
+        if (formVar) {
+            type = t('typeInteractive');
+            const formVarName = formVar.name || 'form1';
+            const regex = new RegExp(`\\{\\{\\s*${formVarName}\\.([a-zA-Z0-9_\\-]+)\\s*\\\}\\}`, 'g');
+            contentPreview = (match.replace || '').replace(regex, '{{$1}}');
+        } else if (match.vars.some(v => v.type === 'date')) {
+            type = t('typeDate');
+        } else {
+            type = t('typeInteractive');
+        }
+    }
+
+    if (contentPreview && contentPreview.length > 150) contentPreview = contentPreview.substring(0, 150) + '...';
+    el.innerHTML = `<div class="match-header"><span class="trigger-badge">${escapeHtml(match.trigger)}</span><span class="type-badge">${type}</span></div><div class="match-content">${escapeHtml(contentPreview || t('dynamicContent'))}</div>`;
+    return el;
+}
+
+function escapeHtml(text) { if (!text) return ''; const el = document.createElement('div'); el.appendChild(document.createTextNode(text)); return el.innerHTML; }
+
+// ========== UNIFIED EDITOR LOGIC ==========
+
+function openEditor(index = -1) {
+    editingIndex = index;
+    dom.editorModal.classList.remove('hidden');
+    dom.btnSaveMatch.onclick = saveMatchFromEditor;
+    dom.btnDeleteMatch.onclick = deleteMatchFromEditor;
+    isPopulating = true;
+
+    if (index === -1) {
+        dom.modalTitle.innerText = t('newMatch');
+        dom.btnDeleteMatch.classList.add('hidden');
+        dom.typeOverlay.classList.remove('hidden');
+        resetEditorFields();
+    } else {
+        dom.modalTitle.innerText = t('editMatch');
+        dom.btnDeleteMatch.classList.remove('hidden');
+        dom.typeOverlay.classList.add('hidden');
+        populateEditor(currentMatches[index]);
+    }
+    isPopulating = false;
+}
+
+function closeEditor() {
+    dom.editorModal.classList.add('hidden');
+}
+
+function resetEditorFields() {
+    dom.triggerInput.value = '';
+    dom.contentInput.value = '';
+    if (dom.dateFormatDefault) dom.dateFormatDefault.value = '%d/%m/%Y';
+    setMatchType('simple');
+    clearVarsConfig();
+    updateEditorUI();
+}
+
+function setMatchType(type) {
+    activeMatchType = type;
+}
+
+function getMatchType() {
+    return activeMatchType;
+}
+
+function clearVarsConfig() {
+    if (dom.varsConfigList) dom.varsConfigList.innerHTML = '';
+    if (dom.varsConfigPanel) dom.varsConfigPanel.classList.add('hidden');
+    if (dom.dateFormatConfig) dom.dateFormatConfig.classList.add('hidden');
+}
+
+// --- Update the unified editor UI based on type ---
+function updateEditorUI() {
+    const type = getMatchType();
+
+    const formatGroup = document.querySelector('.unified-format-group');
+    if (formatGroup) {
+        formatGroup.classList.toggle('hidden', type !== 'rich');
+    }
+
+    if (dom.unifiedModeToggle) {
+        dom.unifiedModeToggle.classList.toggle('hidden', type !== 'rich');
+    }
+
+    const insertGroup = document.querySelector('.unified-insert-group');
+    if (insertGroup) {
+        insertGroup.classList.toggle('hidden', type !== 'interactive');
+    }
+
+    if (type === 'date') {
+        if (!dom.contentInput.value) {
+            dom.contentInput.value = '{{mydate}}';
+        }
+        dom.contentInput.readOnly = false;
+        dom.contentInput.style.backgroundColor = '';
+        dom.contentInput.style.cursor = '';
+    } else {
+        dom.contentInput.readOnly = false;
+        dom.contentInput.style.backgroundColor = '';
+        dom.contentInput.style.cursor = '';
+        if (dom.contentInput.value === '{{mydate}}') {
+            dom.contentInput.value = '';
+        }
+    }
+
+    if (type === 'interactive' || type === 'date') {
+        syncVarsFromText();
+    } else {
+        clearVarsConfig();
+    }
+
+    if (dom.varsConfigPanel) {
+        dom.varsConfigPanel.classList.toggle('hidden', (type !== 'interactive' && type !== 'date'));
+    }
+
+    // Maintient le bloc de format global masqué
+    if (dom.dateFormatConfig) {
+        dom.dateFormatConfig.classList.add('hidden');
+    }
+
+    updatePreview();
+}
+
+// --- INSERT VARIABLE INTO TEXT ---
+
+function getUniqueVarName(baseName) {
+    const text = dom.contentInput.value;
+    const regex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const existing = [];
+    let match;
+    while ((match = regex.exec(text)) !== null) existing.push(match[1]);
+    let counter = 1;
+    let name = baseName;
+    while (existing.includes(name)) { name = `${baseName}_${counter}`; counter++; }
+    return name;
+}
+
+function insertVariable(variableType) {
+    const name = getUniqueVarName(variableType === 'text' ? 'mon_texte' : variableType === 'choice' ? 'mon_choix' : variableType === 'list' ? 'ma_liste' : 'mon_texte');
+    const textarea = dom.contentInput;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const textToInsert = `{{${name}}}`;
+    textarea.value = text.substring(0, start) + textToInsert + text.substring(end);
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+
+    syncVarsFromText();
+
+    const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
+    rows.forEach(row => {
+        const rowName = row.dataset.varName;
+        if (rowName === name) {
+            const typeSelect = row.querySelector('.var-type-select');
+            if (typeSelect) {
+                const typeMap = { 'text': 'static', 'choice': 'choice', 'list': 'list', 'multiline': 'multiline' };
+                typeSelect.value = typeMap[variableType] || 'static';
+                typeSelect.dispatchEvent(new Event('change'));
+            }
+        }
+    });
+
+    updatePreview();
+}
+
+// --- SYNC VARS FROM TEXT ---
+
+function syncVarsFromText() {
+    const content = dom.contentInput.value || '';
+    const regex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const detectedVars = [];
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+        const varName = match[1];
+        if (!detectedVars.includes(varName)) detectedVars.push(varName);
+    }
+
+    // Le formatage se faisant par variable, le bloc global reste masqué
+    if (dom.dateFormatConfig) {
+        dom.dateFormatConfig.classList.add('hidden');
+    }
+
+    const currentRows = dom.varsConfigList.querySelectorAll('.var-config-row');
+    const existingNames = Array.from(currentRows).map(row => row.dataset.varName);
+
+    currentRows.forEach(row => {
+        if (!detectedVars.includes(row.dataset.varName)) {
+            row.remove();
+        }
+    });
+
+    detectedVars.forEach(varName => {
+        if (!existingNames.includes(varName)) {
+            addVarConfigRow(varName);
+        }
+    });
+
+    if (dom.varsConfigPanel) {
+        dom.varsConfigPanel.classList.toggle('hidden', detectedVars.length === 0);
+    }
+
+    updatePreview();
+}
+
+// --- Add configuration row for a variable ---
+function addVarConfigRow(varName) {
+    const template = dom.varConfigRowTemplate;
+    if (!template) return;
+    const clone = template.content.cloneNode(true);
+    const row = clone.querySelector('.var-config-row');
+    row.dataset.varName = varName;
+    row.querySelector('.var-config-name').innerText = `{{${varName}}}`;
+
+    const typeSelect = row.querySelector('.var-type-select');
+    const staticField = row.querySelector('.var-static-field');
+    const multilineField = row.querySelector('.var-multiline-field');
+    const optionsField = row.querySelector('.var-options-field');
+    const dateField = row.querySelector('.var-date-field');
+    const defaultInput = row.querySelector('.var-default-value');
+    const multilineInput = row.querySelector('.var-default-value-multiline');
+    const dateFormatInput = row.querySelector('.var-date-format');
+    const addOptionBtn = row.querySelector('.var-add-option-btn');
+    const optionsList = row.querySelector('.var-options-list');
+
+    const updateFieldVisibility = () => {
+        const type = typeSelect.value;
+        staticField.classList.toggle('hidden', type !== 'static');
+        multilineField.classList.toggle('hidden', type !== 'multiline');
+        if (optionsField) {
+            optionsField.classList.toggle('hidden', type !== 'choice' && type !== 'list');
+        }
+        dateField.classList.toggle('hidden', type !== 'date');
+
+        if ((type === 'choice' || type === 'list') && optionsList && optionsList.children.length === 0) {
+            addVarOptionRow(optionsList, 'Option 1', 'Valeur 1');
+            addVarOptionRow(optionsList, 'Option 2', 'Valeur 2');
+        }
+    };
+
+    typeSelect.addEventListener('change', () => {
+        updateFieldVisibility();
+        updatePreview();
+    });
+
+    // Force l'affichage et le type en 'date' si le match parent est de type 'date'
+    const matchType = getMatchType();
+    if (matchType === 'date') {
+        typeSelect.value = 'date';
+        typeSelect.disabled = true;
+        const typeContainer = row.querySelector('.var-config-type');
+        if (typeContainer) typeContainer.classList.add('hidden');
+    }
+
+    if (defaultInput) defaultInput.addEventListener('input', updatePreview);
+    if (multilineInput) multilineInput.addEventListener('input', updatePreview);
+    if (dateFormatInput) dateFormatInput.addEventListener('input', updatePreview);
+
+    if (addOptionBtn) {
+        addOptionBtn.addEventListener('click', () => {
+            addVarOptionRow(optionsList, '', '');
+            updatePreview();
+        });
+    }
+
+    const toggleBtn = row.querySelector('.var-options-toggle-btn');
+    const optionsTitle = row.querySelector('.var-options-header-title label');
+    if (toggleBtn && optionsField) {
+        const handleCollapse = (e) => {
+            e.preventDefault();
+            const isCollapsed = optionsField.classList.toggle('collapsed');
+            
+            if (optionsList) {
+                optionsList.style.setProperty('display', isCollapsed ? 'none' : 'flex', 'important');
+            }
+            
+            const icon = toggleBtn.querySelector('.toggle-icon');
+            if (icon) {
+                icon.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        };
+        toggleBtn.addEventListener('click', handleCollapse);
+        if (optionsTitle) {
+            optionsTitle.addEventListener('click', handleCollapse);
+        }
+    }
+
+    updateFieldVisibility();
+    dom.varsConfigList.appendChild(row);
+}
+
+// --- Add option row ---
+
+function addVarOptionRow(container, text = '', value = '') {
+    const template = dom.varOptionRowTemplate;
+    if (!template) return;
+    const clone = template.content.cloneNode(true);
+    const row = clone.querySelector('.var-option-row');
+    const textInput = row.querySelector('.var-option-text');
+    const valueInput = row.querySelector('.var-option-value');
+    const removeBtn = row.querySelector('.var-option-remove');
+
+    if (textInput) { textInput.value = text; textInput.addEventListener('input', updatePreview); }
+    if (valueInput) { valueInput.value = value; valueInput.addEventListener('input', updatePreview); }
+    if (removeBtn) { removeBtn.addEventListener('click', () => { row.remove(); updatePreview(); }); }
+
+    container.appendChild(row);
+}
+
+// --- Get vars config data from UI ---
+
+function getVarsConfig() {
+    const config = {};
+    const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
+    rows.forEach(row => {
+        const varName = row.dataset.varName;
+        const typeSelect = row.querySelector('.var-type-select');
+        const type = typeSelect ? typeSelect.value : 'static';
+
+        const defaultInput = row.querySelector('.var-default-value');
+        const multilineInput = row.querySelector('.var-default-value-multiline');
+        const dateFormatInput = row.querySelector('.var-date-format');
+
+        config[varName] = { type: type };
+
+        if (type === 'static') {
+            config[varName].value = defaultInput ? defaultInput.value : '';
+        } else if (type === 'multiline') {
+            config[varName].value = multilineInput ? multilineInput.value : '';
+            config[varName].multiline = true;
+        } else if (type === 'date') {
+            config[varName].format = dateFormatInput ? dateFormatInput.value : '%d/%m/%Y';
+        } else if (type === 'choice' || type === 'list') {
+            const optionsList = row.querySelector('.var-options-list');
+            const optionRows = optionsList ? optionsList.querySelectorAll('.var-option-row') : [];
+            const values = [];
+            optionRows.forEach(optRow => {
+                const optText = optRow.querySelector('.var-option-text').value.trim();
+                const optVal = optRow.querySelector('.var-option-value').value;
+                if (optText || optVal) {
+                    if (optText && optVal && optText !== optVal) {
+                        values.push({ text: optText, value: optVal });
+                    } else {
+                        values.push(optVal || optText);
+                    }
+                }
+            });
+            config[varName].values = values;
+        }
+    });
+    return config;
+}
+
+// --- PREVIEW ---
+
+function updatePreview() {
+    if (!dom.previewSection || !dom.previewContent) return;
+    const type = getMatchType();
+    const content = dom.contentInput.value || '';
+    const varsConfig = getVarsConfig();
+
+    const typeLabelMap = { simple: 'previewTypeSimple', rich: 'previewTypeRich', interactive: 'previewTypeInteractive', date: 'previewTypeDate' };
+    if (dom.previewTypeLabel) {
+        dom.previewTypeLabel.innerText = t(typeLabelMap[type] || 'previewTypeSimple');
+    }
+
+    if (!content) {
+        dom.previewContent.innerHTML = `<span class="preview-empty">${t('previewLabel')}</span>`;
+        return;
+    }
+
+    if (type === 'interactive') {
+        renderInteractiveDualPreview(content, varsConfig);
+    } else {
+        const renderedHTML = renderPreviewContent(content, type, varsConfig);
+        dom.previewContent.innerHTML = renderedHTML;
+        wirePreviewControls(content, varsConfig);
+    }
+}
+
+// --- DOUBLE APERÇU POUR LES FORMULAIRES ---
+
+function renderInteractiveDualPreview(content, varsConfig) {
+    const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const detectedVars = [];
+    let match;
+    while ((match = varRegex.exec(content)) !== null) {
+        const varName = match[1];
+        if (!detectedVars.includes(varName)) detectedVars.push(varName);
+    }
+
+    if (detectedVars.length === 0) {
+        dom.previewContent.innerHTML = `<div class="preview-empty">${t('noVarsDetected')}</div>`;
+        return;
+    }
+
+    // 1. Construit le formulaire de saisie de gauche
+    let formHtml = `<div class="preview-form-fields">`;
+    detectedVars.forEach(varName => {
+        const config = varsConfig[varName] || { type: 'static', value: '' };
+        formHtml += `<div class="preview-form-group">`;
+        formHtml += `<label>{{${escapeHtml(varName)}}}</label>`;
+
+        if (config.type === 'choice' || config.type === 'list') {
+            formHtml += `<select class="preview-form-input" data-var-name="${escapeHtml(varName)}">`;
+            const values = config.values || [];
+            values.forEach(v => {
+                if (typeof v === 'object' && v !== null) {
+                    formHtml += `<option value="${escapeHtml(v.value || '')}">${escapeHtml(v.text || v.value || '')}</option>`;
+                } else {
+                    formHtml += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+                }
+            });
+            formHtml += `</select>`;
+        } else if (config.type === 'date') {
+            const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+            const formattedDate = formatDateString(fmt);
+            formHtml += `<input type="text" class="preview-form-input" value="${escapeHtml(formattedDate)}" readonly style="background-color: #f3f4f6; cursor: not-allowed;">`;
+        } else if (config.type === 'multiline') {
+            formHtml += `<textarea class="preview-form-input" data-var-name="${escapeHtml(varName)}" rows="2" placeholder="${escapeHtml(config.value || '')}"></textarea>`;
+        } else {
+            formHtml += `<input type="text" class="preview-form-input" data-var-name="${escapeHtml(varName)}" value="${escapeHtml(config.value || '')}" placeholder="${escapeHtml(config.value || '')}">`;
+        }
+        formHtml += `</div>`;
+    });
+    formHtml += `</div>`;
+
+    // 2. Insère la structure duale (Formulaire / Résultat)
+    dom.previewContent.innerHTML = `
+        <div class="interactive-preview-container">
+            <div class="preview-form-block">
+                <div class="preview-sublabel">${t('formPreviewTitle')}</div>
+                ${formHtml}
+            </div>
+            <div class="preview-result-block">
+                <div class="preview-sublabel">${t('resultPreviewTitle')}</div>
+                <div class="preview-result-text" id="previewResultText"></div>
+            </div>
+        </div>
+    `;
+
+    // 3. Logique de remplacement et de mise à jour dynamique du résultat obtenu
+    const updateResultText = () => {
+        const resultTextEl = dom.previewContent.querySelector('#previewResultText');
+        if (!resultTextEl) return;
+
+        let output = content;
+
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { type: 'static', value: '' };
+            let val = '';
+
+            if (config.type === 'date') {
+                const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+                val = formatDateString(fmt);
+            } else {
+                const inputEl = dom.previewContent.querySelector(`.preview-form-input[data-var-name="${varName}"]`);
+                if (inputEl) {
+                    val = inputEl.value;
+                    if (!val) {
+                        val = inputEl.placeholder || `{{${varName}}}`;
+                    }
+                } else {
+                    val = config.value || `{{${varName}}}`;
+                }
+            }
+
+            const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\\}\\}`, 'g');
+            output = output.replace(regex, val);
+        });
+
+        resultTextEl.textContent = output;
+    };
+
+    const controls = dom.previewContent.querySelectorAll('.preview-form-input');
+    controls.forEach(ctrl => {
+        ctrl.addEventListener('input', updateResultText);
+        ctrl.addEventListener('change', updateResultText);
+    });
+
+    updateResultText();
+}
+
+function renderPreviewContent(content, type, varsConfig) {
+    if (type === 'rich') {
+        try {
+            if (currentRichMode === 'html') {
+                let html = content;
+                html = html.replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (m, varName) => {
+                    return `<span class="preview-var-placeholder">{{${escapeHtml(varName)}}}</span>`;
+                });
+                return html;
+            } else if (typeof marked !== 'undefined' && marked.parse) {
+                let md = content;
+                md = md.replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (m, varName) => {
+                    return `<span class="preview-var-placeholder">{{${escapeHtml(varName)}}}</span>`;
+                });
+                const renderer = new marked.Renderer();
+                renderer.link = function({ href, title, text }) {
+                    const titleAttr = title ? ` title="${title}"` : '';
+                    return `<a href="${href}"${titleAttr} target="_blank" rel="noopener noreferrer">${text}</a>`;
+                };
+                marked.setOptions({ renderer, breaks: true, gfm: true });
+                return marked.parse(md);
+            } else {
+                return `<pre>${escapeHtml(content)}</pre>`;
+            }
+        } catch (e) {
+            return escapeHtml(content);
+        }
+    }
+
+    const parts = content.split(/(\{\{\s*[a-zA-Z0-9_\-]+\s*\}\})/g);
+    const hasVars = /\{\{\s*[a-zA-Z0-9_\-]+\s*\}\}/.test(content);
+
+    if (!hasVars) {
+        return `<div class="preview-inline-container">${escapeHtml(content)}</div>`;
+    }
+
+    let html = '<div class="preview-inline-container">';
+    const varRegex = /^\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}$/;
+
+    parts.forEach(part => {
+        const match = part.match(varRegex);
+        if (match) {
+            const varName = match[1];
+            let config = varsConfig[varName];
+
+            // Force le type 'date' pour chaque variable présente si le match est de type 'date'
+            if (type === 'date') {
+                config = { type: 'date', format: config?.format || '%d/%m/%Y' };
+            } else if (!config) {
+                config = { type: 'static', value: '' };
+            }
+
+            const uid = `preview-${varName}-${Math.random().toString(36).substr(2, 6)}`;
+
+            if (config.type === 'choice' || config.type === 'list') {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<select class="inline-input preview-select" data-var-name="${escapeHtml(varName)}" data-uid="${uid}">`;
+                const values = config.values || [];
+                if (values.length > 0) {
+                    values.forEach(v => {
+                        if (typeof v === 'object' && v !== null) {
+                            html += `<option value="${escapeHtml(v.value || '')}">${escapeHtml(v.text || v.value || '')}</option>`;
+                        } else {
+                            html += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+                        }
+                    });
+                } else {
+                    html += `<option value="">${escapeHtml(varName)}</option>`;
+                }
+                html += `</select>`;
+                html += `</span>`;
+            } else if (config.type === 'date') {
+                const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+                const formattedDate = formatDateString(fmt);
+                html += `<span class="inline-date-preview" data-var-name="${escapeHtml(varName)}">${escapeHtml(formattedDate)}</span>`;
+            } else if (config.multiline || config.type === 'multiline') {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<textarea class="inline-input preview-multiline" data-var-name="${escapeHtml(varName)}" data-uid="${uid}" rows="1" placeholder="${escapeHtml(varName)}">${escapeHtml(config.value || '')}</textarea>`;
+                html += `</span>`;
+            } else {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<input type="text" class="inline-input preview-input" data-var-name="${escapeHtml(varName)}" data-uid="${uid}" value="${escapeHtml(config.value || '')}" placeholder="${escapeHtml(varName)}" style="width:${Math.max((varName.length + 5) * 8, 80)}px">`;
+                html += `</span>`;
+            }
+
+            html += `<span class="inline-ref-span hidden-ref" data-uid="${uid}" data-var-name="${escapeHtml(varName)}">${escapeHtml(config.value || '')}</span>`;
+        } else {
+            if (part === '') return;
+            html += `<span class="inline-text">${escapeHtml(part)}</span>`;
+        }
+    });
+
+    html += '</div>';
+    return html;
+}
+
+function wirePreviewControls(content, varsConfig) {
+    const previewContainer = dom.previewContent;
+    const inputs = previewContainer.querySelectorAll('.preview-input, .preview-select, .preview-multiline');
+    inputs.forEach(input => {
+        const uid = input.dataset.uid;
+        if (!uid) return;
+
+        const handler = () => {
+            const refSpans = previewContainer.querySelectorAll(`.hidden-ref[data-uid="${uid}"]`);
+            refSpans.forEach(span => {
+                span.innerText = input.value || input.placeholder || '';
+            });
+        };
+
+        if (input.tagName === 'SELECT') {
+            input.addEventListener('change', handler);
+        } else {
+            input.addEventListener('input', handler);
+        }
+
+        handler();
+    });
+
+    const refs = previewContainer.querySelectorAll('.hidden-ref');
+    refs.forEach(ref => {
+        const uid = ref.dataset.uid;
+        if (!uid) return;
+        const sourceInput = previewContainer.querySelector(`[data-uid="${uid}"]`);
+        if (sourceInput) {
+            ref.innerText = sourceInput.value || sourceInput.placeholder || '';
+        }
+    });
+}
+
+// --- POPULATE EDITOR FROM EXISTING MATCH ---
+
+function populateEditor(match) {
+    dom.triggerInput.value = match.trigger || '';
+
+    let type = 'simple';
+    let content = '';
+    let formVar = null;
+
+    if (match.vars && Array.isArray(match.vars)) {
+        formVar = match.vars.find(v => v.type === 'form');
+    }
+
+    if (match.markdown || match.html) {
+        type = 'rich';
+        content = match.replace || '';
+        currentRichMode = match.html ? 'html' : (match.markdown ? 'markdown' : 'html');
+        dom.mdModeBtns.forEach(b => b.classList.toggle('active', b.dataset.richMode === currentRichMode));
+    } else if (formVar) {
+        type = 'interactive';
+        const formVarName = formVar.name || 'form1';
+        const regex = new RegExp(`\\{\\{\\s*${formVarName}\\.([a-zA-Z0-9_\\-]+)\\s*\\\}\\}`, 'g');
+        content = (match.replace || '').replace(regex, '{{$1}}');
+    } else if (match.form) {
+        type = 'interactive';
+        content = match.form.replace(/\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g, '{{$1}}');
+    } else if (match.vars && Array.isArray(match.vars)) {
+        const allVarsAreDate = match.vars.length > 0 && match.vars.every(v => v.type === 'date');
+        if (allVarsAreDate) {
+            type = 'date';
+            content = match.replace || '';
+        } else {
+            type = 'simple';
+            content = match.replace || '';
+        }
+    } else {
+        type = 'simple';
+        content = match.replace || '';
+    }
+
+    setMatchType(type);
+    dom.contentInput.value = content;
+
+    if (type === 'interactive' || type === 'date') {
+        clearVarsConfig();
+        setTimeout(() => {
+            syncVarsFromText();
+            const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
+            
+            let fieldsSource = null;
+            if (formVar && formVar.params && formVar.params.fields) {
+                fieldsSource = formVar.params.fields;
+            } else if (match.form_fields) {
+                fieldsSource = match.form_fields;
+            }
+
+            if (type === 'date' && match.vars) {
+                match.vars.forEach(v => {
+                    rows.forEach(row => {
+                        if (row.dataset.varName === v.name) {
+                            const dateFormatInput = row.querySelector('.var-date-format');
+                            if (dateFormatInput && v.params && v.params.format) {
+                                dateFormatInput.value = v.params.format;
+                            }
+                        }
+                    });
+                });
+            } else if (fieldsSource) {
+                Object.keys(fieldsSource).forEach(varName => {
+                    const fieldConfig = fieldsSource[varName];
+                    rows.forEach(row => {
+                        if (row.dataset.varName === varName) {
+                            const typeSelect = row.querySelector('.var-type-select');
+                            const defaultInput = row.querySelector('.var-default-value');
+                            const multilineInput = row.querySelector('.var-default-value-multiline');
+                            const dateFormatInput = row.querySelector('.var-date-format');
+                            const optionsList = row.querySelector('.var-options-list');
+                            
+                            const fType = fieldConfig.type;
+                            const fParams = fieldConfig.params || {};
+
+                            if (fType === 'choice' || fType === 'list') {
+                                typeSelect.value = 'choice';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (optionsList) {
+                                    optionsList.innerHTML = '';
+                                    const values = fieldConfig.values || fParams.values || fParams.choices;
+                                    if (values) {
+                                        values.forEach(val => {
+                                            if (typeof val === 'object' && val !== null) {
+                                                addVarOptionRow(optionsList, val.label || val.text || '', val.id || val.value || '');
+                                            } else {
+                                                addVarOptionRow(optionsList, val, val);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (fieldConfig.multiline === true || (fType === 'echo' && (fParams.echo || '').includes('\n'))) {
+                                typeSelect.value = 'multiline';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (multilineInput) {
+                                    multilineInput.value = fieldConfig.placeholder || fParams.echo || '';
+                                }
+                            } else if (fType === 'date' || fieldConfig.type === 'date') {
+                                typeSelect.value = 'date';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (dateFormatInput) {
+                                    dateFormatInput.value = fParams.format || fieldConfig.placeholder || '%d/%m/%Y';
+                                }
+                            } else {
+                                typeSelect.value = 'static';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (defaultInput) {
+                                    defaultInput.value = fieldConfig.placeholder || fParams.echo || fParams.value || '';
+                                }
+                            }
+                            typeSelect.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+            }
+            updatePreview();
+        }, 50);
+    }
+
+    updateEditorUI();
+    updatePreview();
+}
+// --- SAVE MATCH FROM EDITOR ---
+
+function saveMatchFromEditor() {
+    const type = getMatchType();
+    const trigger = dom.triggerInput.value.trim();
+    const content = dom.contentInput.value || '';
+
+    if (!trigger) {
+        alert(t('alertTriggerRequired'));
+        return;
+    }
+
+    const newMatch = { trigger: trigger };
+
+    if (type === 'rich') {
+        newMatch.replace = content;
+        if (currentRichMode === 'html') {
+            newMatch.html = true;
+        } else {
+            newMatch.markdown = true;
+        }
+    } else if (type === 'simple') {
+        newMatch.replace = content;
+    } else if (type === 'date') {
+        const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+        const detectedVars = [];
+        let match;
+        while ((match = varRegex.exec(content)) !== null) {
+            if (!detectedVars.includes(match[1])) detectedVars.push(match[1]);
+        }
+
+        newMatch.replace = content;
+        
+        const varsConfig = getVarsConfig();
+        const varsArray = [];
+
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { format: '%d/%m/%Y' };
+            const formatVal = config.format || '%d/%m/%Y';
+            varsArray.push({
+                name: varName,
+                type: 'date',
+                params: {
+                    format: formatVal
+                }
+            });
+        });
+
+        if (varsArray.length > 0) {
+            newMatch.vars = varsArray;
+        }
+    } else if (type === 'interactive') {
+        const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+        const detectedVars = [];
+        let match;
+        while ((match = varRegex.exec(content)) !== null) {
+            if (!detectedVars.includes(match[1])) detectedVars.push(match[1]);
+        }
+
+        const varsConfig = getVarsConfig();
+        
+        let replaceText = content;
+        detectedVars.forEach(varName => {
+            const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\\}\\}`, 'g');
+            replaceText = replaceText.replace(regex, `{{form1.${varName}}}`);
+        });
+        
+        newMatch.replace = replaceText;
+        
+        const formLayout = detectedVars.map(v => `[[${v}]]`).join('\n');
+        const formFields = {};
+        
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { type: 'static', value: '' };
+            const fieldDef = {};
+
+            if (config.type === 'choice' || config.type === 'list') {
+                const valuesList = (config.values || []).map(v => {
+                    if (typeof v === 'object' && v !== null) {
+                        return v.value || v.text || v.id || String(v);
+                    }
+                    return String(v);
+                });
+                fieldDef.type = 'choice';
+                fieldDef.values = valuesList;
+            } else if (config.type === 'multiline') {
+                fieldDef.multiline = true;
+                if (config.value) fieldDef.placeholder = config.value;
+            } else if (config.type === 'date') {
+                fieldDef.type = 'date';
+                if (config.format) fieldDef.placeholder = config.format;
+            } else {
+                if (config.value) fieldDef.placeholder = config.value;
+            }
+
+            formFields[varName] = fieldDef;
+        });
+        
+        newMatch.vars = [
+            {
+                name: 'form1',
+                type: 'form',
+                params: {
+                    layout: formLayout,
+                    fields: formFields
+                }
+            }
+        ];
+    }
+
+    if (editingIndex === -1) {
+        currentMatches.push(newMatch);
+    } else {
+        currentMatches[editingIndex] = newMatch;
+    }
+
+    const targetIndex = (editingIndex === -1) ? currentMatches.length - 1 : editingIndex;
+    closeEditor();
+    markActiveFileAsModified();
+    renderMatches(targetIndex);
+    updateYamlPreview();
+}
+
+function deleteMatchFromEditor() {
+    if (editingIndex !== -1) {
+        if (confirm(t('confirmDelete'))) {
+            currentMatches.splice(editingIndex, 1);
+            markActiveFileAsModified();
+            renderMatches();
+            updateYamlPreview();
+            closeEditor();
+        }
+    }
+}
+
+// --- Live Preview Logic ---
+
+function updateYamlPreview() {
+    if (document.activeElement === dom.yamlEditor) return;
+    const yaml = generateYaml();
+    dom.yamlEditor.value = yaml;
+}
+
+function handleYamlEditorInput() {
+    const text = dom.yamlEditor.value;
+    try {
+        const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA });
+        if (data && data.matches) {
+            currentMatches = data.matches;
+            markActiveFileAsModified();
+            renderMatches();
+        }
+    } catch (e) { /* allow invalid YAML while typing */ }
+}
+
+function formatYamlPreview() {
+    dom.yamlEditor.value = generateYaml();
+}
+
+function copyYamlContent() {
+    navigator.clipboard.writeText(dom.yamlEditor.value).then(() => {
+        const btn = dom.btnCopyYaml;
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${t('copied')}`;
+        setTimeout(() => { btn.innerHTML = originalContent; }, 2000);
+    });
+}
+
+// --- Format toolbar ---
+
+const formatSyntax = {
+    html_b: { before: '<b>', after: '</b>', placeholder: 'gras' },
+    html_i: { before: '<i>', after: '</i>', placeholder: 'italique' },
+    html_s: { before: '<s>', after: '</s>', placeholder: 'barré' },
+    html_u: { before: '<u>', after: '</u>', placeholder: 'souligné' },
+    html_link: { before: '<a href="', after: '">', placeholder: 'url', then: 'texte</a>' },
+    html_code: { before: '<code>', after: '</code>', placeholder: 'code' },
+    html_ul: { before: '<ul>\n  <li>', after: '</li>\n</ul>', placeholder: 'élément', block: true },
+    html_ol: { before: '<ol>\n  <li>', after: '</li>\n</ol>', placeholder: 'élément', block: true },
+    md_bold: { before: '**', after: '**', placeholder: 'texte en gras' },
+    md_italic: { before: '*', after: '*', placeholder: 'texte en italique' },
+    md_strikethrough: { before: '~~', after: '~~', placeholder: 'texte barré' },
+    md_code: { before: '`', after: '`', placeholder: 'code' },
+    md_link: { before: '[', after: '](url)', placeholder: 'texte du lien' },
+    md_ul: { before: '- ', after: '', placeholder: 'élément de liste', block: true },
+    md_ol: { before: '1. ', after: '', placeholder: 'élément numéroté', block: true }
+};
+
+function handleFormatToolbar(action) {
+    let syntax;
+    if (getMatchType() === 'rich' && currentRichMode === 'markdown') {
+        const mdMap = { html_b: 'md_bold', html_i: 'md_italic', html_s: 'md_strikethrough', html_code: 'md_code', html_link: 'md_link', html_ul: 'md_ul', html_ol: 'md_ol' };
+        const mdAction = mdMap[action] || action;
+        syntax = formatSyntax[mdAction];
+    } else {
+        syntax = formatSyntax[action];
+    }
+
+    if (!syntax) return;
+
+    const textarea = dom.contentInput;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+
+    let before = syntax.before;
+    let after = syntax.after;
+    let placeholder = syntax.placeholder;
+    const isBlock = syntax.block || false;
+
+    if (isBlock && !selected) {
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = text.indexOf('\n', start);
+        const line = text.substring(lineStart, lineEnd !== -1 ? lineEnd : text.length);
+        const newText = text.substring(0, lineStart) + before + line + after + text.substring(lineStart + line.length);
+        textarea.value = newText;
+        const newPos = lineStart + before.length + line.length + after.length;
+        textarea.selectionStart = newPos;
+        textarea.selectionEnd = newPos;
+    } else if (isBlock && selected) {
+        const lines = selected.split('\n');
+        const wrappedLines = lines.map((l, i) => (i === 0 && action === 'ol' ? before : before) + l);
+        const newText = text.substring(0, start) + wrappedLines.join('\n') + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start;
+        textarea.selectionEnd = start + wrappedLines.join('\n').length;
+    } else if (!selected && placeholder) {
+        const insertion = before + placeholder + after;
+        const newText = text.substring(0, start) + insertion + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + placeholder.length;
+    } else if (selected) {
+        const insertion = before + selected + after;
+        const newText = text.substring(0, start) + insertion + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + selected.length;
+    }
+
+    textarea.focus();
+    updatePreview();
+}
+
+// --- Date Format Helper ---
+
+function formatDateString(format) {
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    const day = pad(now.getDate());
+    const month = pad(now.getMonth() + 1);
+    const year = now.getFullYear();
+    const hour = pad(now.getHours());
+    const minute = pad(now.getMinutes());
+    const second = pad(now.getSeconds());
+    const locale = currentLang === 'fr' ? 'fr-FR' : 'en-US';
+    const dayName = now.toLocaleDateString(locale, { weekday: 'long' });
+    const monthName = now.toLocaleDateString(locale, { month: 'long' });
+    const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+    return format.replace(/%d/g, day).replace(/%m/g, month).replace(/%Y/g, year).replace(/%H/g, hour).replace(/%M/g, minute).replace(/%S/g, second).replace(/%A/g, cap(dayName)).replace(/%B/g, cap(monthName));
+}
+
+// --- Create New File/Folder ---
+
+async function createNewFile() {
+    if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
+    const fileName = prompt(t('promptFileName'), 'nouveau.yml');
+    if (!fileName) return;
+    let finalName = fileName;
+    if (!finalName.endsWith('.yml') && !finalName.endsWith('.yaml')) finalName += '.yml';
+    try {
+        if (window.showDirectoryPicker && currentDirHandle) {
+            let fileHandle;
+            try {
+                fileHandle = await currentDirHandle.getFileHandle(finalName);
+                if (!confirm(t('confirmOverwriteFile'))) return;
+                const writable = await fileHandle.createWritable();
+                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+                await writable.write(defaultContent); await writable.close();
+            } catch (e) {
+                fileHandle = await currentDirHandle.getFileHandle(finalName, { create: true });
+                const writable = await fileHandle.createWritable();
+                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+                await writable.write(defaultContent); await writable.close();
+            }
+        } else {
+            const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+            const blob = new Blob([defaultContent], { type: 'text/yaml;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a'); link.href = url; link.download = finalName;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+        }
+        dom.statusMessage.innerText = t('newFileCreated') + finalName;
+        if (window.showDirectoryPicker && currentDirHandle) await readDirectory(currentDirHandle);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating file:', err); alert(t('errorCreatingFile')); } }
+}
+
+async function createNewFolder() {
+    if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
+    if (!window.showDirectoryPicker) { alert(t('errorCreatingFolder') + ' ' + t('alertNoApi')); return; }
+    const folderName = prompt(t('promptFolderName'), 'nouveau-dossier');
+    if (!folderName) return;
+    if (!/^[a-zA-Z0-9_\- ]+$/.test(folderName)) { alert(t('errorCreatingFolder')); return; }
+    try {
+        await currentDirHandle.getDirectoryHandle(folderName, { create: true });
+        
+        if (!folderDirs.includes(folderName)) {
+            folderDirs.push(folderName);
+        }
+        
+        dom.statusMessage.innerText = t('newFolderCreated') + folderName;
+        await readDirectory(currentDirHandle);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating folder:', err); alert(t('errorCreatingFolder')); } }
+}
+
+// Start
+init();
