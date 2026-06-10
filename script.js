@@ -1,6 +1,7 @@
 /**
  * Espanso Editor Logic
  * Handles File System Access API, YAML parsing/dumping, and UI rendering.
+ * UNIFIED EDITOR VERSION - Uses {{var}} syntax, auto-detected variables, always-visible preview
  */
 
 // --- Translations ---
@@ -8,7 +9,12 @@ const translations = {
     fr: {
         appTitle: "Espanso YAML Editor",
         headerSubtitle: "Créez vos raccourcis Espanso facilement",
-        btnOpen: "Ouvrir",
+        btnOpen: "Ouvrir un fichier",
+        btnOpenFolder: "Ouvrir un dossier",
+        statusFolderOpened: "Dossier ouvert : ",
+        noYamlFilesFound: "Aucun fichier YAML (.yml ou .yaml) trouvé dans ce dossier.",
+        sidebarFiles: "Fichiers",
+        sidebarTriggers: "Raccourcis",
         btnSave: "Enregistrer",
         btnSaveAs: "Enregistrer sous...",
         btnDropdownTitle: "Plus d'options",
@@ -31,81 +37,80 @@ const translations = {
         newMatch: "Nouveau Match",
         contentType: "Type de contenu",
         typeSimple: "Texte Simple",
-        typeForm: "Formulaire",
+        typeRich: "Texte riche",
+        typeInteractive: "Formulaire",
         typeDate: "Date",
         triggerLabel: "Déclencheur (Trigger)",
         triggerPlaceholder: ":monraccourci",
         triggerHelp: "Le texte à taper pour déclencher le remplacement (ex: :date)",
-        contentLabelReplacement: "Texte de remplacement",
-        contentLabelForm: "Contenu du Formulaire",
-        contentLabelDate: "Texte (ex: La date est {{mydate}})",
-        contentPlaceholder: "Votre texte ici...",
-        contentHelp: "Vous pouvez utiliser plusieurs lignes.",
-        contentHelpForm: "Utilisez [[nom_variable]] pour créer des champs. Les champs simples (texte) ne nécessitent pas de configuration.",
-        contentHelpDate: "Formatez votre date : %d (jour), %m (mois), %Y (année), %H (heure), %M (minute), %A (jour complet), %B (mois complet).",
-        specialFieldsTitle: "Champs Spéciaux (Listes, Choix)",
-        specialFieldsHelp: "Définissez ici les variables qui nécessitent un menu déroulant ou une liste.",
-        btnAddField: "+ Ajouter un champ spécial",
-        formPreviewLabel: "Aperçu du formulaire",
-        datePreviewLabel: "Aperçu du résultat",
-        fieldNamePlaceholder: "Nom variable (ex: choices)",
-        removeField: "Supprimer",
-        fieldType: "Type",
-        fieldText: "Texte (Input)",
-        fieldChoice: "Choix (Dropdown)",
-        fieldList: "Liste (Selection)",
-        fieldMultiline: "Texte Multiligne",
-        fieldValues: "Valeurs (une par ligne)",
-        fieldValuesPlaceholder: "Option 1\nOption 2",
-        dateFormatLabel: "Format de la date",
-        dateHint: "%d(jour), %m(mois), %Y(année), %H:%M",
+        contentPlaceholder: "Votre texte ici... Utilisez {{nom}} pour créer des variables.",
+        previewLabel: "Aperçu",
+        insertLabel: "Insérer",
+        insertText: "Champ texte",
+        insertChoice: "Choix (dropdown)",
+        insertList: "Liste (selection)",
+        insertMultiline: "Texte multilignes",
+        varsConfigTitle: "Variables détectées",
+        varsConfigHint: "Utilisez {{nom}} dans le texte pour créer une variable",
+        dateConfigTitle: "Format de date par défaut",
+        varTypeStatic: "Texte (static)",
+        varTypeChoice: "Choix (dropdown)",
+        varTypeList: "Liste (selection)",
+        varTypeMultiline: "Texte multilignes",
+        varTypeDate: "Date",
+        varDefaultValue: "Valeur par défaut",
+        varDateFormat: "Format",
+        varChoicesList: "Options",
+        addOption: "+ Ajouter",
+        tooltipContentType: "Choisissez si vous voulez un texte simple, un texte riche (HTML/Markdown), un contenu interactif avec variables, ou une date automatique.",
+        tooltipTrigger: "Le mot-clé (souvent commençant par :) qui déclenchera le remplacement.",
+        selectTypeTitle: "Quel type de raccourci ?",
+        selectTypeDesc: "Choisissez le format de base.",
         dateParameters: "Paramètres : %d (jour), %m (mois), %Y (année), %H:%M (heure).",
         btnDelete: "Supprimer",
         btnCancel: "Annuler",
         btnSaveMatch: "Valider",
-        selectTypeTitle: "Quel type de raccourci ?",
-        selectTypeDesc: "Choisissez le format de base. Ce choix ne pourra pas être modifié pour ce raccourci.",
-        dateModeNote: "Ce mode est optimisé pour les raccourcis de date simples. Pour un formulaire mixant texte et date, préférez le mode 'Formulaire'.",
-        tooltipContentType: "Choisissez si vous voulez un texte simple, un formulaire avec des variables, ou une date automatique.",
-        tooltipTrigger: "Le mot-clé (souvent commençant par :) qui déclenchera le remplacement.",
-        tooltipContent: "Le texte qui remplacera votre déclencheur. Pour les formulaires, utilisez [[variable]].",
-        tooltipSpecialFields: "Configurez ici vos variables de type liste ou choix multiples.",
-        tooltipDateFormat: "Codes : %d (jour), %m (mois), %Y (année), %H:%M (heure). Ex : %d/%m/%Y",
-        helpModalTitle: "Comment utiliser cet outil ?",
-        whatIsEspanso: "Qu'est-ce qu'Espanso ?",
-        espansoDesc: "Espanso est un <strong>remplaceur de texte</strong> (text expander). Il surveille ce que vous tapez et remplace instantanément des mots-clés par du contenu plus long, des dates, ou des formulaires complexes.",
-        whatIsTool: "À quoi sert cet éditeur ?",
-        toolDesc: "Espanso utilise des fichiers .yml pour stocker vos raccourcis. Ce site vous permet de :",
-        feature1: "Créer des raccourcis visuellement sans erreur de syntaxe.",
-        feature2: "Gérer des formulaires avec choix et listes déroulantes.",
-        feature3: "Générer des dates automatiques au bon format.",
-        whereToSave: "Où enregistrer vos fichiers ?",
-        savePathDesc: "Pour qu'Espanso détecte vos raccourcis, enregistrez votre fichier dans le dossier match de votre configuration :",
-        savePathTip: "Astuce : Vous pouvez créer autant de fichiers .yml que vous le souhaitez dans ce dossier pour organiser vos raccourcis par thèmes (ex : pro.yml, perso.yml, etc.).",
-        tableOS: "Système",
-        tablePath: "Chemin du répertoire /match",
-        btnCopyMini: "Copier",
-        securityNote: "Note : Pour des raisons de sécurité, les navigateurs ne peuvent pas écrire directement dans vos dossiers système. Enregistrez le fichier sur votre bureau, puis déplacez-le manuellement.",
-        btnGotIt: "Compris",
-        footerPowered: "Propulsé par",
-        footerMadeWith: "Fait avec",
-        footerBy: "par",
-        alertNoApi: "Votre navigateur ne supporte pas l'API d'accès aux fichiers native.",
         alertTriggerRequired: "Le trigger est obligatoire.",
-        alertFormRequired: "Un formulaire doit contenir au moins une variable [[nom_variable]].\n\nExemple : Bonjour [[prenom]], votre email est [[email]]",
         confirmDelete: "Supprimer ce match ?",
         noMatchesFound: "Aucun match trouvé.",
         copied: "Copié !",
-        textMultilinePreview: "[texte multiligne...]",
-        choicePreview: "[choix]",
         dynamicContent: "(Contenu dynamique)",
         sidebarTitle: "Explorateur",
-        btnSortAlpha: "Trier A-Z"
+        btnNewFile: "Nouveau fichier YML",
+        btnNewFolder: "Nouveau dossier",
+        promptFileName: "Nom du fichier YML :",
+        promptFolderName: "Nom du dossier :",
+        newFileCreated: "Nouveau fichier créé : ",
+        newFolderCreated: "Nouveau dossier créé : ",
+        errorCreatingFile: "Erreur lors de la création du fichier.",
+        errorCreatingFolder: "Erreur lors de la création du dossier.",
+        confirmOverwriteFile: "Le fichier existe déjà. Voulez-vous l'écraser ?",
+        noFolderOpened: "Vous devez d'abord ouvrir un dossier.",
+        btnGotIt: "Compris",
+        alertNoApi: "Votre navigateur ne supporte pas l'API d'accès aux fichiers native.",
+        confirmOverwrite: "Confirmer ?",
+        alertFormRequired: "Un formulaire doit contenir au moins une variable {{nom}}.",
+        richModeHtml: "HTML",
+        richModeMarkdown: "Markdown",
+        previewTypeSimple: "Texte simple",
+        previewTypeRich: "Rendu HTML",
+        previewTypeInteractive: "Aperçu interactif",
+        previewTypeDate: "Aperçu date",
+        formPreviewTitle: "Formulaire de saisie",
+        resultPreviewTitle: "Texte généré (Résultat)",
+        dateGuideLink: "Guide complet des formats (Chrono)",
+        noVarsDetected: "Aucune variable détectée dans votre texte. Utilisez le bouton d'insertion ou écrivez {{nom_variable}}."
     },
     en: {
         appTitle: "Espanso YAML Editor",
+        dateGuideLink: "Full format guide (Chrono)",
         headerSubtitle: "Create your Espanso shortcuts easily",
-        btnOpen: "Open",
+        btnOpen: "Open File",
+        btnOpenFolder: "Open Folder",
+        statusFolderOpened: "Folder opened: ",
+        noYamlFilesFound: "No YAML files (.yml or .yaml) found in this folder.",
+        sidebarFiles: "Files",
+        sidebarTriggers: "Shortcuts",
         btnSave: "Save",
         btnSaveAs: "Save As...",
         btnDropdownTitle: "More options",
@@ -128,90 +133,108 @@ const translations = {
         newMatch: "New Match",
         contentType: "Content Type",
         typeSimple: "Simple Text",
-        typeForm: "Form",
+        typeRich: "Rich Text",
+        typeInteractive: "Form",
         typeDate: "Date",
-        typeSelect: "Select Type",
         triggerLabel: "Trigger",
         triggerPlaceholder: ":myshortcut",
         triggerHelp: "The text to type to trigger replacement (ex: :date)",
-        contentLabelReplacement: "Replacement Text",
-        contentLabelForm: "Form Content",
-        contentLabelDate: "Text (ex: The date is {{mydate}})",
-        contentPlaceholder: "Your text here...",
-        contentHelp: "You can use multiple lines.",
-        contentHelpForm: "Use [[variable_name]] to create fields. Simple fields (text) don't need configuration.",
-        contentHelpDate: "Format your date: %d (day), %m (month), %Y (year), %H (hour), %M (minute), %A (full day), %B (full month).",
-        specialFieldsTitle: "Special Fields (Lists, Choices)",
-        specialFieldsHelp: "Define variables that require a dropdown menu or a list here.",
-        btnAddField: "+ Add a special field",
-        formPreviewLabel: "Form preview",
-        datePreviewLabel: "Result preview",
-        fieldNamePlaceholder: "Variable name (ex: choices)",
-        removeField: "Delete",
-        fieldType: "Type",
-        fieldText: "Text (Input)",
-        fieldChoice: "Choice (Dropdown)",
-        fieldList: "List (Selection)",
-        fieldMultiline: "Multiline Text",
-        fieldValues: "Values (one per line)",
-        fieldValuesPlaceholder: "Option 1\nOption 2",
-        dateFormatLabel: "Date Format",
-        dateHint: "%d(day), %m(month), %Y(year), %H:%M",
+        contentPlaceholder: "Your text here... Use {{name}} to create variables.",
+        previewLabel: "Preview",
+        insertLabel: "Insert",
+        insertText: "Text field",
+        insertChoice: "Choice (dropdown)",
+        insertList: "List (selection)",
+        insertMultiline: "Multiline text",
+        varsConfigTitle: "Detected Variables",
+        varsConfigHint: "Use {{name}} in the text to create a variable",
+        dateConfigTitle: "Default date format",
+        varTypeStatic: "Text (static)",
+        varTypeChoice: "Choice (dropdown)",
+        varTypeList: "List (selection)",
+        varTypeMultiline: "Multiline text",
+        varTypeDate: "Date",
+        varDefaultValue: "Default value",
+        varDateFormat: "Format",
+        varChoicesList: "Options",
+        addOption: "+ Add",
+        tooltipContentType: "Choose between simple text, rich text (HTML/Markdown), interactive content with variables, or an automatic date.",
+        tooltipTrigger: "The keyword (often starting with :) that will trigger the replacement.",
+        selectTypeTitle: "What type of shortcut?",
+        selectTypeDesc: "Choose the base format.",
         dateParameters: "Parameters: %d (day), %m (month), %Y (year), %H:%M (hour).",
         btnDelete: "Delete",
         btnCancel: "Cancel",
         btnSaveMatch: "Apply",
-        selectTypeTitle: "What type of shortcut?",
-        selectTypeDesc: "Choose the base format. This choice cannot be changed for this shortcut.",
-        dateModeNote: "This mode is optimized for simple date shortcuts. For a form mixing text and dates, use the 'Form' mode instead.",
-        tooltipContentType: "Choose between simple text, a form with variables, or an automatic date.",
-        tooltipTrigger: "The keyword (often starting with :) that will trigger the replacement.",
-        tooltipContent: "The text that will replace your trigger. For forms, use [[variable]].",
-        tooltipSpecialFields: "Configure your list or multiple-choice variables here.",
-        tooltipDateFormat: "Codes: %d (day), %m (month), %Y (year), %H:%M (hour). E.g.: %d/%m/%Y",
-        helpModalTitle: "How to use this tool?",
-        whatIsEspanso: "What is Espanso?",
-        espansoDesc: "Espanso is a <strong>text expander</strong>. It monitors what you type and instantly replaces keywords with longer content, dates, or complex forms.",
-        whatIsTool: "What is this editor for?",
-        toolDesc: "Espanso uses .yml files to store your shortcuts. This site allows you to:",
-        feature1: "Create shortcuts visually without syntax errors.",
-        feature2: "Manage forms with dropdown choices and lists.",
-        feature3: "Generate automatic dates in the correct format.",
-        whereToSave: "Where to save your files?",
-        savePathDesc: "To make Espanso detect your shortcuts, save your file in the match folder of your configuration:",
-        savePathTip: "Tip: You can create as many .yml files as you want in this folder to organize your shortcuts by theme (e.g., work.yml, personal.yml, etc.).",
-        tableOS: "System",
-        tablePath: "/match folder path",
-        btnCopyMini: "Copy",
-        securityNote: "Note: For security reasons, browsers cannot write directly to your system folders. Save the file to your desktop, then move it manually.",
-        btnGotIt: "Got it",
-        footerPowered: "Powered by",
-        footerMadeWith: "Made with",
-        footerBy: "by",
-        alertNoApi: "Your browser does not support the native file access API.",
         alertTriggerRequired: "Trigger is mandatory.",
-        alertFormRequired: "A form must contain at least one [[variable_name]] variable.\n\nExample: Hello [[firstname]], your email is [[email]]",
         confirmDelete: "Delete this match?",
         noMatchesFound: "No matches found.",
         copied: "Copied!",
-        textMultilinePreview: "[multiline text...]",
-        choicePreview: "[choice]",
         dynamicContent: "(Dynamic content)",
         sidebarTitle: "Explorer",
-        btnSortAlpha: "Sort A-Z"
+        btnNewFile: "New YML file",
+        btnNewFolder: "New folder",
+        promptFileName: "YML file name:",
+        promptFolderName: "Folder name:",
+        newFileCreated: "New file created: ",
+        newFolderCreated: "New folder created: ",
+        errorCreatingFile: "Error creating file.",
+        errorCreatingFolder: "Error creating folder.",
+        confirmOverwriteFile: "File already exists. Overwrite?",
+        noFolderOpened: "You must open a folder first.",
+        btnGotIt: "Got it",
+        alertNoApi: "Your browser does not support the native file access API.",
+        confirmOverwrite: "Confirm?",
+        alertFormRequired: "A form must contain at least one {{variable}}.",
+        richModeHtml: "HTML",
+        richModeMarkdown: "Markdown",
+        previewTypeSimple: "Simple text",
+        previewTypeRich: "HTML render",
+        previewTypeInteractive: "Interactive preview",
+        previewTypeDate: "Date preview",
+        formPreviewTitle: "Input Form",
+        resultPreviewTitle: "Generated Text (Result)",
+        noVarsDetected: "No variables detected in your text. Use the insert button or write {{variable_name}}."
     }
 };
+
+// --- Rich Text Mode ---
+let currentRichMode = 'html';
 
 // Global State
 let currentMatches = [];
 let fileHandle = null;
 let currentLang = 'fr';
+let activeMatchType = 'simple';
+let isSingleFileModified = false; // Ajouté pour le suivi en mode fichier unique
+
+// Folder mode state
+let isFolderMode = false;
+let folderFiles = [];
+let folderDirs = []; // Stocke la liste de tous les répertoires (y compris les dossiers vides)
+let activeFolderFileIndex = -1;
+let currentDirHandle = null;
+
+// Sort state
+let sortDirection = 1;
+let fileSortDirection = 1;
+
+// Expanded state for folder tree
+let expandedFolders = {};
+
+// Editor state
+let editingIndex = -1;
+let isPopulating = false;
+
+// Check API Support
+const supportsFileSystemAPI = 'showOpenFilePicker' in window;
 
 // DOM Elements
 const dom = {
     matchesList: document.getElementById('matchesList'),
     statusMessage: document.getElementById('statusMessage'),
     btnLoad: document.getElementById('btnLoad'),
+    btnOpenFolder: document.getElementById('btnOpenFolder'),
     btnSave: document.getElementById('btnSave'),
     btnSaveAs: document.getElementById('btnSaveAs'),
     btnDropdown: document.getElementById('btnDropdown'),
@@ -220,12 +243,10 @@ const dom = {
     sidebarList: document.getElementById('sidebarList'),
     btnHelp: document.getElementById('btnHelp'),
 
-    // Help Modal
     helpModal: document.getElementById('helpModal'),
     btnCloseHelp: document.getElementById('btnCloseHelp'),
     btnCloseHelpFooter: document.getElementById('btnCloseHelpFooter'),
 
-    // Editor Modal
     editorModal: document.getElementById('editorModal'),
     modalTitle: document.getElementById('modalTitle'),
     btnCloseModal: document.getElementById('btnCloseModal'),
@@ -235,42 +256,49 @@ const dom = {
     typeOverlay: document.getElementById('typeOverlay'),
     typeButtons: document.querySelectorAll('.type-btn-large'),
 
-    // Inputs
     triggerInput: document.getElementById('triggerInput'),
     contentInput: document.getElementById('contentInput'),
-    contentLabel: document.getElementById('contentLabel'),
-    contentHelp: document.getElementById('contentHelp'),
-    dateFormat: document.getElementById('dateFormat'),
-    datePreview: document.getElementById('datePreview'),
 
-    // Sections
-    contentSection: document.getElementById('contentSection'),
-    formFieldsSection: document.getElementById('formFieldsSection'),
-    dateSection: document.getElementById('dateSection'),
-
-    // Visual Builder
-    fieldsList: document.getElementById('fieldsList'),
-    btnAddField: document.getElementById('btnAddField'),
-    fieldRowTemplate: document.getElementById('fieldRowTemplate'),
-    formPreview: document.getElementById('formPreview'),
-    formPreviewContent: document.getElementById('formPreviewContent'),
-
-    // Radios
-    typeRadios: document.getElementsByName('matchType'),
+    // Unified editor elements
+    previewSection: document.getElementById('previewSection'),
+    previewContent: document.getElementById('previewContent'),
+    previewTypeLabel: document.getElementById('previewTypeLabel'),
+    varsConfigPanel: document.getElementById('varsConfigPanel'),
+    varsConfigList: document.getElementById('varsConfigList'),
+    dateFormatConfig: document.getElementById('dateFormatConfig'),
+    dateFormatDefault: document.getElementById('dateFormatDefault'),
 
     // Live Preview
     yamlEditor: document.getElementById('yamlEditor'),
     btnFormatYaml: document.getElementById('btnFormatYaml'),
     btnCopyYaml: document.getElementById('btnCopyYaml'),
 
+    // New folder/file buttons
+    btnNewFile: document.getElementById('btnNewFile'),
+    btnNewFolder: document.getElementById('btnNewFolder'),
+
     // Lang buttons
     langBtns: document.querySelectorAll('.lang-btn'),
-    btnSortAlpha: document.getElementById('btnSortAlpha')
+    btnSortAlpha: null,
+    btnSortFiles: null,
+
+    // Insert menu
+    btnInsertToggle: document.getElementById('btnInsertToggle'),
+    insertMenu: document.getElementById('insertMenu'),
+    insertMenuItems: document.querySelectorAll('.insert-menu-item'),
+
+    // Toolbar mode toggle
+    unifiedModeToggle: document.getElementById('unifiedModeToggle'),
+    mdToolbarBtns: document.querySelectorAll('.unified-toolbar .md-toolbar-btn'),
+    mdModeBtns: document.querySelectorAll('.unified-mode-toggle .md-mode-btn'),
+
+    // Templates
+    varConfigRowTemplate: document.getElementById('varConfigRowTemplate'),
+    varOptionRowTemplate: document.getElementById('varOptionRowTemplate')
 };
 
 // --- Initialization ---
 function init() {
-    // Load lang from localStorage
     const savedLang = localStorage.getItem('espanso_lang');
     if (savedLang && translations[savedLang]) {
         currentLang = savedLang;
@@ -280,11 +308,21 @@ function init() {
     setupEventListeners();
     renderMatches();
     updateYamlPreview();
-    updateDatePreview();
+
+    // Empêche la fermeture accidentelle du navigateur en cas de modifications non sauvegardées
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
 }
 
 function setupEventListeners() {
     dom.btnLoad.addEventListener('click', loadFile);
+    if (dom.btnOpenFolder) {
+        dom.btnOpenFolder.addEventListener('click', loadFolder);
+    }
     dom.btnSave.addEventListener('click', (e) => saveFile(e.currentTarget));
     dom.btnSaveAs.addEventListener('click', (e) => {
         saveFileAs(e.currentTarget);
@@ -305,32 +343,64 @@ function setupEventListeners() {
     dom.btnCloseHelp.addEventListener('click', closeHelp);
     dom.btnCloseHelpFooter.addEventListener('click', closeHelp);
 
-    // Initial Type Selection
+    // Initial Type Selection (overlay)
     dom.typeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const type = btn.dataset.type;
             setMatchType(type);
-            updateEditorFields();
+            updateEditorUI();
             dom.typeOverlay.classList.add('hidden');
         });
     });
 
-    // Visual Builder
-    dom.btnAddField.addEventListener('click', () => addFieldRow());
-
-    // Form/Date content input - update preview on change
+    // Content input -> update preview and vars
     dom.contentInput.addEventListener('input', () => {
-        updateFormPreview();
-        updateDatePreview();
+        updatePreview();
+        syncVarsFromText();
     });
 
-    // Date Preview
-    dom.dateFormat.addEventListener('input', updateDatePreview);
-
-    // Dynamic Form Handling
-    Array.from(dom.typeRadios).forEach(radio => {
-        radio.addEventListener('change', updateEditorFields);
+    // Insert menu toggle
+    if (dom.btnInsertToggle) {
+        dom.btnInsertToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dom.insertMenu.classList.toggle('hidden');
+        });
+    }
+    document.addEventListener('click', () => {
+        if (dom.insertMenu) dom.insertMenu.classList.add('hidden');
     });
+
+    // Insert menu items
+    dom.insertMenuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const type = item.dataset.insertType;
+            insertVariable(type);
+            dom.insertMenu.classList.add('hidden');
+        });
+    });
+
+    // Toolbar format buttons
+    dom.mdToolbarBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleFormatToolbar(btn.dataset.md);
+        });
+    });
+
+    // Mode toggle (HTML/Markdown)
+    dom.mdModeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentRichMode = btn.dataset.richMode;
+            dom.mdModeBtns.forEach(b => b.classList.toggle('active', b.dataset.richMode === currentRichMode));
+            updatePreview();
+        });
+    });
+
+    // Date default format
+    if (dom.dateFormatDefault) {
+        dom.dateFormatDefault.addEventListener('input', updatePreview);
+    }
 
     // Live Preview
     dom.yamlEditor.addEventListener('input', handleYamlEditorInput);
@@ -343,27 +413,29 @@ function setupEventListeners() {
             currentLang = btn.dataset.lang;
             localStorage.setItem('espanso_lang', currentLang);
             updateLanguageUI();
-
-            // Re-render things that depend on lang
             renderMatches();
-            updateEditorFields();
-            updateFormPreview();
+            if (!dom.editorModal.classList.contains('hidden')) {
+                updateEditorUI();
+                updatePreview();
+            }
         });
     });
 
-    if (dom.btnSortAlpha) {
-        dom.btnSortAlpha.addEventListener('click', () => sortMatchesAlphabetically());
+    // New file/folder
+    if (dom.btnNewFile) {
+        dom.btnNewFile.addEventListener('click', createNewFile);
+    }
+    if (dom.btnNewFolder) {
+        dom.btnNewFolder.addEventListener('click', createNewFolder);
     }
 
     initTooltips();
 }
 
-
 // --- Tooltips Logic ---
 let globalTooltip = null;
 
 function initTooltips() {
-    // Create global tooltip if not exists
     if (!document.querySelector('.global-tooltip')) {
         globalTooltip = document.createElement('div');
         globalTooltip.className = 'global-tooltip';
@@ -372,83 +444,53 @@ function initTooltips() {
         globalTooltip = document.querySelector('.global-tooltip');
     }
 
-    // Delegate mouseover/mouseout
     document.addEventListener('mouseover', (e) => {
         if (e.target.classList.contains('tooltip-icon')) {
             const text = e.target.getAttribute('data-tooltip');
-            if (text) {
-                showGlobalTooltip(e.target, text);
-            }
+            if (text) showGlobalTooltip(e.target, text);
         }
     });
 
     document.addEventListener('mouseout', (e) => {
-        if (e.target.classList.contains('tooltip-icon')) {
-            hideGlobalTooltip();
-        }
+        if (e.target.classList.contains('tooltip-icon')) hideGlobalTooltip();
     });
 
-    // Hide on scroll to prevent detachment
     document.addEventListener('scroll', hideGlobalTooltip, true);
     window.addEventListener('resize', hideGlobalTooltip);
 }
 
 function showGlobalTooltip(target, text) {
     if (!globalTooltip) return;
-
     globalTooltip.textContent = text;
     globalTooltip.classList.add('visible');
-
     const rect = target.getBoundingClientRect();
     const tooltipRect = globalTooltip.getBoundingClientRect();
-
-    // Position above centered
     let top = rect.top - tooltipRect.height - 10;
     let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-
-    // Keep within viewport
-    // Check Top
-    if (top < 10) {
-        // Not enough space above, show below
-        top = rect.bottom + 10;
-    }
-
-    // Check Left
+    if (top < 10) top = rect.bottom + 10;
     if (left < 10) left = 10;
-
-    // Check Right
     if (left + tooltipRect.width > window.innerWidth - 10) {
         left = window.innerWidth - tooltipRect.width - 10;
     }
-
     globalTooltip.style.top = `${top}px`;
     globalTooltip.style.left = `${left}px`;
 }
 
 function hideGlobalTooltip() {
-    if (globalTooltip) {
-        globalTooltip.classList.remove('visible');
-    }
+    if (globalTooltip) globalTooltip.classList.remove('visible');
 }
 
 // --- I18n Logic ---
 
 function updateLanguageUI() {
     const t = translations[currentLang];
-
-    // Select all elements with translation attributes, including those in templates
     const elements = Array.from(document.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]'));
-
-    // Add elements from within templates
     document.querySelectorAll('template').forEach(template => {
         elements.push(...Array.from(template.content.querySelectorAll('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-tooltip]')));
     });
 
     elements.forEach(el => {
-        // Skip buttons in feedback state to avoid flickering
         if (el.closest && el.closest('.btn-feedback-active')) return;
-
-        // data-i18n (text/html)
         if (el.dataset.i18n) {
             const key = el.dataset.i18n;
             if (t[key]) {
@@ -456,32 +498,24 @@ function updateLanguageUI() {
                 else el.innerText = t[key];
             }
         }
-
-        // data-i18n-placeholder
         if (el.dataset.i18nPlaceholder) {
             const key = el.dataset.i18nPlaceholder;
             if (t[key]) el.placeholder = t[key];
         }
-
-        // data-i18n-title
         if (el.dataset.i18nTitle) {
             const key = el.dataset.i18nTitle;
             if (t[key]) el.title = t[key];
         }
-
-        // data-i18n-tooltip
         if (el.dataset.i18nTooltip) {
             const key = el.dataset.i18nTooltip;
             if (t[key]) el.setAttribute('data-tooltip', t[key]);
         }
     });
 
-    // Update active button
     dom.langBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 
-    // Update Large buttons in overlay
     document.querySelectorAll('.type-btn-large').forEach(btn => {
         const type = btn.dataset.type;
         const key = 'type' + type.charAt(0).toUpperCase() + type.slice(1);
@@ -489,7 +523,6 @@ function updateLanguageUI() {
         if (span && t[key]) span.innerText = t[key];
     });
 
-    // Update status bar if it's empty
     if (!fileHandle) {
         dom.statusMessage.innerText = t.statusEmpty;
     }
@@ -500,353 +533,1052 @@ function t(key) {
 }
 
 function closeDropdown() {
-    if (dom.saveDropdown) {
-        dom.saveDropdown.classList.add('hidden');
-    }
+    if (dom.saveDropdown) dom.saveDropdown.classList.add('hidden');
 }
 
 // --- Help Logic ---
-
-function openHelp() {
-    dom.helpModal.classList.remove('hidden');
-}
-
-function closeHelp() {
-    dom.helpModal.classList.add('hidden');
-}
+function openHelp() { dom.helpModal.classList.remove('hidden'); }
+function closeHelp() { dom.helpModal.classList.add('hidden'); }
 
 function copyText(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-        showFeedback(btn, 'copied');
-    });
+    navigator.clipboard.writeText(text).then(() => showFeedback(btn, 'copied'));
 }
 
-/**
- * Shows temporary feedback on a button
- */
 function showFeedback(btn, key) {
     const span = btn.querySelector('span[data-i18n]') || btn;
     const originalKey = span.getAttribute('data-i18n');
-
     btn.classList.add('btn-feedback-active');
     span.innerText = translations[currentLang][key] || key;
-
     setTimeout(() => {
         btn.classList.remove('btn-feedback-active');
-        // Restore official translation
-        if (originalKey) {
-            span.innerText = translations[currentLang][originalKey];
-        }
+        if (originalKey) span.innerText = translations[currentLang][originalKey];
     }, 2000);
+}
+
+function hasUnsavedChanges() {
+    if (isFolderMode) {
+        return folderFiles.some(f => f.isModified);
+    }
+    return isSingleFileModified;
+}
+
+function confirmUnsavedChanges() {
+    if (hasUnsavedChanges()) {
+        const message = currentLang === 'fr' 
+            ? "Vous avez des modifications non enregistrées. Voulez-vous vraiment continuer sans sauvegarder ?" 
+            : "You have unsaved changes. Do you really want to proceed without saving?";
+        return confirm(message);
+    }
+    return true;
+}
+
+function updateSingleFileStatusIndicator() {
+    if (isFolderMode) return;
+    const t = translations[currentLang];
+    const baseStatus = fileHandle ? `${t.statusOpened}${fileHandle.name}` : t.statusEmpty;
+    if (isSingleFileModified) {
+        dom.statusMessage.innerHTML = `${baseStatus} <span class="modified-dot" style="display:inline; margin-left:5px;">●</span>`;
+    } else {
+        dom.statusMessage.innerText = baseStatus;
+    }
 }
 
 // --- File System Logic ---
 
 async function loadFile() {
-    try {
-        if (!window.showOpenFilePicker) {
-            alert(t('alertNoApi'));
-            return;
-        }
-
-        const [handle] = await window.showOpenFilePicker({
-            types: [{
-                description: 'Espanso YAML Files',
-                accept: { 'text/yaml': ['.yml', '.yaml'] },
-            }],
+    if (!confirmUnsavedChanges()) return;
+    if (!window.showOpenFilePicker) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.yml,.yaml';
+        input.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                isFolderMode = false;
+                fileHandle = null;
+                isSingleFileModified = false;
+                parseYaml(text);
+                dom.statusMessage.innerText = `${t('statusOpened')}${file.name}`;
+                renderSidebar();
+            } catch (err) {
+                console.error('Error reading file:', err);
+                alert(t('statusErrorLoading'));
+            }
         });
-
+        input.click();
+        return;
+    }
+    try {
+        const [handle] = await window.showOpenFilePicker({
+            types: [{ description: 'Espanso YAML Files', accept: { 'text/yaml': ['.yml', '.yaml'] } }],
+        });
+        isFolderMode = false;
         fileHandle = handle;
+        isSingleFileModified = false;
         const file = await fileHandle.getFile();
         const text = await file.text();
-
         parseYaml(text);
         dom.statusMessage.innerText = `${t('statusOpened')}${file.name}`;
     } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error loading file:', err);
-            alert(t('statusErrorLoading'));
+        if (err.name !== 'AbortError') { console.error('Error loading file:', err); alert(t('statusErrorLoading')); }
+    }
+}
+
+async function loadFolder() {
+    if (!confirmUnsavedChanges()) return;
+    try {
+        if (!window.showDirectoryPicker) { openFolderFallback(); return; }
+        const dirHandle = await window.showDirectoryPicker();
+        await readDirectory(dirHandle);
+    } catch (err) {
+        if (err.name !== 'AbortError') { console.error('Error loading folder:', err); alert(t('statusErrorLoading')); }
+    }
+}
+
+async function readDirectory(dirHandle) {
+    try {
+        const { files, dirs } = await getFilesAndDirsRecursive(dirHandle);
+        
+        files.sort((a, b) => {
+            const aParts = a.relativePath.split('/');
+            const bParts = b.relativePath.split('/');
+            const aDir = aParts.slice(0, -1).join('/');
+            const bDir = bParts.slice(0, -1).join('/');
+            const aFile = aParts[aParts.length - 1];
+            const bFile = bParts[bParts.length - 1];
+            if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; return aFile.localeCompare(bFile); }
+            if (aDir && !bDir) return -1; if (!aDir && bDir) return 1; return aFile.localeCompare(bFile);
+        });
+
+        folderFiles = [];
+        for (const f of files) {
+            try {
+                const file = await f.handle.getFile();
+                const text = await file.text();
+                let parsedMatches = [];
+                let hasParseError = false;
+                let parseErrorMessage = '';
+                try { 
+                    const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }); 
+                    if (data && data.matches) {
+                        parsedMatches = data.matches; 
+                    } else {
+                        parsedMatches = [];
+                    }
+                } catch (e) { 
+                    console.warn(`Error parsing YAML in ${f.relativePath}:`, e); 
+                    hasParseError = true;
+                    parseErrorMessage = e.message;
+                }
+                folderFiles.push({ 
+                    name: f.relativePath, 
+                    handle: f.handle, 
+                    content: text, 
+                    matches: parsedMatches, 
+                    isModified: false,
+                    hasParseError: hasParseError,
+                    parseErrorMessage: parseErrorMessage
+                });
+            } catch (e) { console.error(`Error reading file ${f.relativePath}:`, e); }
         }
+
+        folderDirs = dirs.map(d => d.relativePath);
+        currentDirHandle = dirHandle;
+        isFolderMode = true;
+        
+        if (folderFiles.length > 0) {
+            activeFolderFileIndex = -1; // Reset de l'index actif pour éviter le report d'état
+            selectFolderFile(0);
+        } else {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+            renderMatches();
+            updateYamlPreview();
+        }
+        dom.statusMessage.innerText = `${t('statusFolderOpened')}${dirHandle.name}`;
+    } catch (err) {
+        console.error('Error reading directory:', err);
+        alert(t('statusErrorLoading'));
+    }
+}
+
+async function getFilesAndDirsRecursive(dirHandle, path = '', depth = 0) {
+    const MAX_DEPTH = 10;
+    if (depth > MAX_DEPTH) { console.warn(`Reached max depth at "${path}"`); return { files: [], dirs: [] }; }
+    let files = [];
+    let dirs = [];
+    for await (const entry of dirHandle.values()) {
+        const relativePath = path ? `${path}/${entry.name}` : entry.name;
+        if (entry.kind === 'file') { 
+            if (entry.name.endsWith('.yml') || entry.name.endsWith('.yaml')) {
+                files.push({ handle: entry, relativePath }); 
+            }
+        } else if (entry.kind === 'directory') { 
+            dirs.push({ handle: entry, relativePath });
+            const sub = await getFilesAndDirsRecursive(entry, relativePath, depth + 1); 
+            files = files.concat(sub.files);
+            dirs = dirs.concat(sub.dirs);
+        }
+    }
+    return { files, dirs };
+}
+
+function openFolderFallback() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.directory = true;
+    input.multiple = true;
+    input.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files).filter(f => f.name.endsWith('.yml') || f.name.endsWith('.yaml'));
+        files.sort((a, b) => {
+            const aPath = a.webkitRelativePath, bPath = b.webkitRelativePath;
+            const aParts = aPath.split('/'), bParts = bPath.split('/');
+            aParts.shift(); bParts.shift();
+            const aDir = aParts.slice(0, -1).join('/'), bDir = bParts.slice(0, -1).join('/');
+            const aFile = aParts[aParts.length - 1], bFile = bParts[bParts.length - 1];
+            if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; return aFile.localeCompare(bFile); }
+            if (aDir && !bDir) return -1; if (!aDir && bDir) return 1; return aFile.localeCompare(bFile);
+        });
+        
+        folderFiles = [];
+        const detectedDirs = new Set();
+        for (const file of files) {
+            try {
+                const text = await file.text();
+                let parsedMatches = [];
+                let hasParseError = false;
+                let parseErrorMessage = '';
+                try { 
+                    const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA }); 
+                    if (data && data.matches) {
+                        parsedMatches = data.matches; 
+                    } else {
+                        parsedMatches = [];
+                    }
+                } catch (err) { 
+                    console.warn(`Error parsing YAML in ${file.webkitRelativePath}:`, err); 
+                    hasParseError = true;
+                    parseErrorMessage = err.message;
+                }
+                const parts = file.webkitRelativePath.split('/'); parts.shift();
+                const relativePath = parts.join('/') || file.name;
+                
+                for (let i = 1; i < parts.length; i++) {
+                    detectedDirs.add(parts.slice(0, i).join('/'));
+                }
+                
+                folderFiles.push({ 
+                    name: relativePath, 
+                    handle: null, 
+                    fileObject: file, 
+                    content: text, 
+                    matches: parsedMatches, 
+                    isModified: false,
+                    hasParseError: hasParseError,
+                    parseErrorMessage: parseErrorMessage
+                });
+            } catch (err) { console.error(`Error reading file ${file.name}:`, err); }
+        }
+        
+        folderDirs = Array.from(detectedDirs);
+        isFolderMode = true;
+        
+        if (folderFiles.length > 0) {
+            activeFolderFileIndex = -1;
+            selectFolderFile(0);
+        } else {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+            renderMatches();
+            updateYamlPreview();
+        }
+        const rootFolder = e.target.files[0]?.webkitRelativePath.split('/')[0] || 'Dossier';
+        dom.statusMessage.innerText = `${t('statusFolderOpened')}${rootFolder}`;
+    });
+    input.click();
+}
+
+function selectFolderFile(index) {
+    if (index < 0 || index >= folderFiles.length) return;
+    
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length && activeFolderFileIndex !== index) {
+        const oldFile = folderFiles[activeFolderFileIndex];
+        if (!oldFile.hasParseError) {
+            oldFile.matches = [...currentMatches];
+            oldFile.content = generateYaml();
+        }
+    }
+    
+    activeFolderFileIndex = index;
+    const activeFile = folderFiles[index];
+    currentMatches = [...activeFile.matches];
+    fileHandle = activeFile.handle;
+    
+    renderMatches();
+    
+    if (activeFile.hasParseError) {
+        dom.yamlEditor.value = activeFile.content;
+    } else {
+        updateYamlPreview();
+    }
+}
+
+function markActiveFileAsModified() {
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        folderFiles[activeFolderFileIndex].isModified = true;
+        renderSidebar();
+    } else if (!isFolderMode) {
+        isSingleFileModified = true;
+        updateSingleFileStatusIndicator();
     }
 }
 
 async function saveFile(btn = dom.btnSave) {
-    if (!fileHandle) {
-        saveFileAs(btn);
-        return;
+    if (!fileHandle) { saveFileAs(btn); return; }
+    if (isFolderMode) {
+        const fileName = fileHandle.name || 'fichier';
+        if (!confirm(`Vous allez écraser le fichier original "${fileName}". Confirmer ?`)) return;
     }
-
     try {
         const writable = await fileHandle.createWritable();
-        const yamlContent = generateYaml();
+        
+        let yamlContent;
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            if (activeFile.hasParseError) {
+                yamlContent = dom.yamlEditor.value;
+            } else {
+                yamlContent = generateYaml();
+            }
+        } else {
+            yamlContent = generateYaml();
+        }
+        
         await writable.write(yamlContent);
         await writable.close();
+        
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            activeFile.isModified = false;
+            activeFile.content = yamlContent;
+            
+            try {
+                const data = jsyaml.load(yamlContent, { schema: jsyaml.CORE_SCHEMA });
+                if (data && data.matches) {
+                    activeFile.matches = data.matches;
+                    activeFile.hasParseError = false;
+                    activeFile.parseErrorMessage = '';
+                    currentMatches = [...activeFile.matches];
+                }
+            } catch (e) {
+                activeFile.hasParseError = true;
+                activeFile.parseErrorMessage = e.message;
+            }
+            
+            renderSidebar();
+            renderMatches();
+        } else if (!isFolderMode) {
+            isSingleFileModified = false;
+            updateSingleFileStatusIndicator();
+        }
+        
         dom.statusMessage.innerText = `${t('statusOpened')}${fileHandle.name} (${new Date().toLocaleTimeString()})`;
-
         showFeedback(btn, 'statusSavedShort');
-    } catch (err) {
-        console.error('Error saving file:', err);
-        alert(t('statusErrorSaving'));
-    }
+    } catch (err) { console.error('Error saving file:', err); alert(t('statusErrorSaving')); }
 }
 
 async function saveFileAs(btn = dom.btnSaveAs) {
+    const yamlContent = generateYaml();
+    let fileName = 'match.yml';
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        const pathParts = folderFiles[activeFolderFileIndex].name.split('/');
+        fileName = pathParts[pathParts.length - 1];
+    } else if (fileHandle) { fileName = fileHandle.name; }
+    if (!window.showSaveFilePicker) {
+        try {
+            const blob = new Blob([yamlContent], { type: 'text/yaml;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a'); link.href = url; link.download = fileName;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+            if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+                folderFiles[activeFolderFileIndex].isModified = false;
+                folderFiles[activeFolderFileIndex].content = yamlContent;
+                renderSidebar();
+            }
+            dom.statusMessage.innerText = `${t('statusSaved')} : ${fileName}`;
+            showFeedback(btn, 'statusSavedShort');
+        } catch (err) { console.error('Error downloading file:', err); alert(t('statusErrorSaving')); }
+        return;
+    }
     try {
         const handle = await window.showSaveFilePicker({
-            types: [{
-                description: 'Espanso YAML File',
-                accept: { 'text/yaml': ['.yml'] },
-            }],
+            suggestedName: fileName,
+            types: [{ description: 'Espanso YAML File', accept: { 'text/yaml': ['.yml'] } }],
         });
-
         fileHandle = handle;
-        await saveFile(btn);
-    } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error('Error saving file:', err);
+        if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            folderFiles[activeFolderFileIndex].handle = handle;
+            folderFiles[activeFolderFileIndex].name = handle.name;
         }
-    }
+        await saveFile(btn);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error saving file:', err); alert(t('statusErrorSaving')); } }
 }
 
 // --- Data Parsing/Generation ---
 
 function parseYaml(text) {
     try {
-        const data = jsyaml.load(text);
-        if (data && data.matches) {
-            currentMatches = data.matches;
-        } else {
-            currentMatches = [];
-            console.warn('No matches found or invalid structure');
-        }
+        const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA });
+        if (data && data.matches) { currentMatches = data.matches; } else { currentMatches = []; }
         renderMatches();
-        updateYamlPreview(); // Sync preview
-    } catch (e) {
-        alert(t('statusErrorLoading') + ' : ' + e.message);
-    }
+        updateYamlPreview();
+    } catch (e) { alert(t('statusErrorLoading') + ' : ' + e.message); }
 }
 
 function generateYaml() {
-    const data = {
-        matches: currentMatches
-    };
-
-    const header = `# espanso match file
-# Generated by Espanso Editor
-
-matches:
-`;
-
-    if (!currentMatches || currentMatches.length === 0) {
-        return header;
-    }
-
-    const yamlBody = jsyaml.dump(data.matches, {
-        indent: 2,
-        lineWidth: -1,
-        quotingType: '"',
-        noRefs: true
-    });
-
-    // Indent every line with 2 spaces to align under "matches:"
+    const data = { matches: currentMatches };
+    const header = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+    if (!currentMatches || currentMatches.length === 0) return header;
+    const yamlBody = jsyaml.dump(data.matches, { indent: 2, lineWidth: -1, quotingType: '"', noRefs: true });
     const indentedBody = yamlBody.split('\n').map(line => line ? '  ' + line : line).join('\n');
-
     return header + indentedBody;
 }
 
 // --- Drag and Drop Logic ---
 let draggedIndex = null;
 
-function handleDragStart(e, index) {
-    draggedIndex = index;
-    e.dataTransfer.effectAllowed = 'move';
-    e.target.classList.add('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    const target = e.target.closest('.sidebar-item');
-    if (target) {
-        target.classList.add('drag-over');
-    }
-}
-
-function handleDragLeave(e) {
-    const target = e.target.closest('.sidebar-item');
-    if (target) {
-        target.classList.remove('drag-over');
-    }
-}
-
+function handleDragStart(e, index) { draggedIndex = index; e.dataTransfer.effectAllowed = 'move'; e.target.classList.add('dragging'); }
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const t = e.target.closest('.sidebar-item'); if (t) t.classList.add('drag-over'); }
+function handleDragLeave(e) { const t = e.target.closest('.sidebar-item'); if (t) t.classList.remove('drag-over'); }
 function handleDrop(e, targetIndex) {
-    e.preventDefault();
-    const target = e.target.closest('.sidebar-item');
-    if (target) {
-        target.classList.remove('drag-over');
-    }
-
+    e.preventDefault(); const t = e.target.closest('.sidebar-item'); if (t) t.classList.remove('drag-over');
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
-    // Reorder array
-    const item = currentMatches.splice(draggedIndex, 1)[0];
-    currentMatches.splice(targetIndex, 0, item);
-
-    renderMatches(targetIndex);
-    updateYamlPreview();
+    const item = currentMatches.splice(draggedIndex, 1)[0]; currentMatches.splice(targetIndex, 0, item);
+    markActiveFileAsModified(); renderMatches(targetIndex); updateYamlPreview();
 }
-
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-    draggedIndex = null;
-}
+function handleDragEnd(e) { e.target.classList.remove('dragging'); draggedIndex = null; }
 
 function sortMatchesAlphabetically() {
     if (!currentMatches || currentMatches.length < 2) return;
+    sortDirection = sortDirection === 1 ? -1 : 1;
+    currentMatches.sort((a, b) => { return (a.trigger || "").toLowerCase().localeCompare((b.trigger || "").toLowerCase()) * sortDirection; });
+    updateSortButtonIcon(); markActiveFileAsModified(); renderMatches(); updateYamlPreview();
+}
 
-    currentMatches.sort((a, b) => {
-        const triggerA = (a.trigger || "").toLowerCase();
-        const triggerB = (b.trigger || "").toLowerCase();
-        return triggerA.localeCompare(triggerB);
+function sortFilesAlphabetically() {
+    if (!isFolderMode || folderFiles.length < 2) return;
+    fileSortDirection = fileSortDirection === 1 ? -1 : 1;
+    updateFileSortButtonIcon(); renderSidebar();
+}
+
+// --- File Tree & Drag Logic ---
+function saveExpandedState(node, parentPath) {
+    if (node.children) { for (const dirName of Object.keys(node.children)) { const dirPath = parentPath ? parentPath + '/' + dirName : dirName; expandedFolders[dirPath] = node.children[dirName].expanded; saveExpandedState(node.children[dirName], dirPath); } }
+}
+function buildFileTree(fileList) {
+    const root = { children: {}, files: [] };
+    
+    if (Array.isArray(folderDirs)) {
+        folderDirs.forEach(dirPath => {
+            const parts = dirPath.split('/');
+            let current = root;
+            for (let i = 0; i < parts.length; i++) {
+                const dirName = parts[i];
+                if (!current.children[dirName]) {
+                    const currentPath = parts.slice(0, i + 1).join('/');
+                    const savedExpanded = expandedFolders[currentPath];
+                    current.children[dirName] = {
+                        name: dirName,
+                        parent: current,
+                        children: {},
+                        files: [],
+                        expanded: savedExpanded !== undefined ? savedExpanded : true
+                    };
+                }
+                current = current.children[dirName];
+            }
+        });
+    }
+
+    const sorted = [...fileList].sort((a, b) => {
+        const aParts = a.name.split('/'), bParts = b.name.split('/');
+        const aDir = aParts.slice(0, -1).join('/'), bDir = bParts.slice(0, -1).join('/');
+        if (aDir && !bDir) return -1; if (!aDir && bDir) return 1;
+        if (aDir && bDir) { const dc = aDir.localeCompare(bDir); if (dc !== 0) return dc; }
+        return (aParts[aParts.length - 1] || '').localeCompare((bParts[bParts.length - 1] || '')) * fileSortDirection;
     });
 
-    renderMatches();
-    updateYamlPreview();
+    sorted.forEach(file => {
+        const parts = file.name.split('/');
+        if (parts.length === 1) {
+            root.files.push(file);
+        } else {
+            let current = root;
+            for (let i = 0; i < parts.length - 1; i++) {
+                const dirName = parts[i];
+                if (!current.children[dirName]) {
+                    const dirPath = parts.slice(0, i + 1).join('/');
+                    const savedExpanded = expandedFolders[dirPath];
+                    current.children[dirName] = { 
+                        name: dirName, 
+                        parent: current, 
+                        children: {}, 
+                        files: [], 
+                        expanded: savedExpanded !== undefined ? savedExpanded : true 
+                    };
+                }
+                current = current.children[dirName];
+            }
+            current.files.push(file);
+        }
+    });
+    return root;
+}
+let fileDragData = null;
+
+function handleFileDragStart(e, fileIndex) { fileDragData = { index: fileIndex }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'file'); e.target.classList.add('dragging'); }
+function handleFileDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.add('drag-over'); }
+function handleFileDragLeave(e) { const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.remove('drag-over'); }
+function handleFileDrop(e, targetFileIndex) {
+    e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
+    if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
+    if (fileDragData.index === targetFileIndex) { fileDragData = null; return; }
+    const sourceFile = folderFiles[fileDragData.index], targetFile = folderFiles[targetFileIndex];
+    if (!sourceFile || !targetFile) { fileDragData = null; return; }
+    const targetParts = targetFile.name.split('/'); const targetDir = targetParts.slice(0, -1).join('/');
+    moveFileToDirectory(sourceFile, targetDir);
+}
+async function handleFileDropOnDir(e, dirPath) {
+    e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
+    if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
+    const sourceFile = folderFiles[fileDragData.index]; if (!sourceFile) { fileDragData = null; return; }
+    moveFileToDirectory(sourceFile, dirPath);
+}
+function fileDragEnd(e) { e.target.classList.remove('dragging'); fileDragData = null; }
+async function moveFileToDirectory(sourceFile, targetDirPath) {
+    const sourceName = sourceFile.name.split('/').pop();
+    const sourceDir = sourceFile.name.split('/').slice(0, -1).join('/');
+    if (sourceDir === targetDirPath) { fileDragData = null; return; }
+    if (!confirm(`${currentLang === 'fr' ? 'Déplacer ce fichier ?' : 'Move this file?'}\n"${sourceName}" → ${targetDirPath || '(racine)'}`)) { fileDragData = null; return; }
+    try {
+        const sourcePathParts = sourceFile.name.split('/'); let sourceDirHandle = currentDirHandle;
+        for (let i = 0; i < sourcePathParts.length - 1; i++) sourceDirHandle = await sourceDirHandle.getDirectoryHandle(sourcePathParts[i]);
+        const fileHandleToMove = sourceFile.handle;
+        let destDirHandle = currentDirHandle;
+        if (targetDirPath) { const dirParts = targetDirPath.split('/'); for (const dirPart of dirParts) destDirHandle = await destDirHandle.getDirectoryHandle(dirPart, { create: true }); }
+        try { await destDirHandle.getFileHandle(sourceName); if (!confirm(`${currentLang === 'fr' ? 'Le fichier existe déjà. Remplacer ?' : 'File already exists. Overwrite?'}`)) { fileDragData = null; return; } } catch (e) {}
+        await fileHandleToMove.move(destDirHandle, sourceName);
+        await readDirectory(currentDirHandle);
+    } catch (err) { console.error('Error moving file:', err); alert(t('errorCreatingFile') + ': ' + err.message); }
+    fileDragData = null;
+}
+
+function updateFileSortButtonIcon() {
+    if (!dom.btnSortFiles) return;
+    const svgArrow = fileSortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+    dom.btnSortFiles.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgArrow}</svg>`;
+}
+
+function updateSortButtonIcon() {
+    if (!dom.btnSortAlpha) return;
+    const svgArrow = sortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+    dom.btnSortAlpha.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgArrow}</svg>`;
+    dom.btnSortAlpha.title = sortDirection === 1 ? t('btnSortAlpha') : (currentLang === 'fr' ? 'Trier Z-A' : 'Sort Z-A');
+}
+
+// Résout récursivement un handle de sous-dossier à partir de son chemin virtuel
+async function getDirHandleFromPath(dirPath) {
+    if (!dirPath) return currentDirHandle;
+    const parts = dirPath.split('/');
+    let current = currentDirHandle;
+    for (const part of parts) {
+        if (part) {
+            current = await current.getDirectoryHandle(part);
+        }
+    }
+    return current;
+}
+
+async function renameFile(fileIndex) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const fileObj = folderFiles[fileIndex];
+    const oldName = fileObj.name.split('/').pop();
+    const newName = prompt(currentLang === 'fr' ? "Nouveau nom du fichier :" : "New file name:", oldName);
+    if (!newName || newName === oldName) return;
+    
+    let finalName = newName;
+    if (!finalName.endsWith('.yml') && !finalName.endsWith('.yaml')) {
+        finalName += '.yml';
+    }
+    
+    try {
+        await fileObj.handle.move(finalName);
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error renaming file:", err);
+        alert(currentLang === 'fr' ? "Erreur lors du renommage du fichier." : "Error renaming file.");
+    }
+}
+
+async function deleteFile(fileIndex) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const fileObj = folderFiles[fileIndex];
+    const name = fileObj.name.split('/').pop();
+    if (!confirm(currentLang === 'fr' ? `Supprimer définitivement le fichier "${name}" ?` : `Permanently delete file "${name}"?`)) return;
+    
+    try {
+        if (typeof fileObj.handle.remove === 'function') {
+            await fileObj.handle.remove();
+        } else {
+            const pathParts = fileObj.name.split('/');
+            const parentPath = pathParts.slice(0, -1).join('/');
+            const parentHandle = await getDirHandleFromPath(parentPath);
+            await parentHandle.removeEntry(pathParts[pathParts.length - 1]);
+        }
+        
+        if (activeFolderFileIndex === fileIndex) {
+            activeFolderFileIndex = -1;
+            currentMatches = [];
+            fileHandle = null;
+        }
+        
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error deleting file:", err);
+        alert(currentLang === 'fr' ? "Erreur lors de la suppression." : "Error deleting file.");
+    }
+}
+
+// Vérifie si un dossier est vide
+async function isDirEmpty(dirHandle) {
+    for await (const entry of dirHandle.values()) {
+        return false; // Contient au moins un élément
+    }
+    return true; // Dossier vide
+}
+
+// Copie récursivement le contenu d'un répertoire source vers un répertoire cible
+async function copyDirectoryHelper(sourceHandle, targetHandle) {
+    for await (const entry of sourceHandle.values()) {
+        if (entry.kind === 'file') {
+            const file = await entry.getFile();
+            const newFileHandle = await targetHandle.getFileHandle(entry.name, { create: true });
+            const writable = await newFileHandle.createWritable();
+            await writable.write(file);
+            await writable.close();
+        } else if (entry.kind === 'directory') {
+            const newDirHandle = await targetHandle.getDirectoryHandle(entry.name, { create: true });
+            const subSourceHandle = await sourceHandle.getDirectoryHandle(entry.name);
+            await copyDirectoryHelper(subSourceHandle, newDirHandle);
+        }
+    }
+}
+
+// Fonction de suppression de dossier mise à jour avec vérification de contenu
+async function deleteFolder(dirPath) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const parts = dirPath.split('/');
+    const dirName = parts[parts.length - 1];
+    
+    try {
+        const dirHandle = await getDirHandleFromPath(dirPath);
+        const isEmpty = await isDirEmpty(dirHandle);
+        
+        let confirmationMessage = "";
+        if (!isEmpty) {
+            confirmationMessage = currentLang === 'fr' 
+                ? `⚠️ Le dossier "${dirName}" n'est pas vide. Voulez-vous vraiment supprimer ce dossier et TOUT son contenu ?`
+                : `⚠️ The folder "${dirName}" is not empty. Do you really want to delete this folder and ALL its contents?`;
+        } else {
+            confirmationMessage = currentLang === 'fr'
+                ? `Supprimer le dossier vide "${dirName}" ?`
+                : `Delete empty folder "${dirName}"?`;
+        }
+        
+        if (!confirm(confirmationMessage)) return;
+        
+        const parentPath = parts.slice(0, -1).join('/');
+        const parentHandle = await getDirHandleFromPath(parentPath);
+        await parentHandle.removeEntry(dirName, { recursive: true });
+        
+        // Réinitialise la sélection active si le fichier en cours d'édition était dans le dossier supprimé
+        if (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            const activeFile = folderFiles[activeFolderFileIndex];
+            if (activeFile.name.startsWith(dirPath + '/')) {
+                activeFolderFileIndex = -1;
+                currentMatches = [];
+                fileHandle = null;
+            }
+        }
+        
+        await readDirectory(currentDirHandle);
+    } catch (err) {
+        console.error("Error deleting folder:", err);
+        alert(currentLang === 'fr' ? "Erreur lors de la suppression du dossier." : "Error deleting folder.");
+    }
+}
+
+// Fonction de renommage de dossier mise à jour avec contournement pour Chrome
+async function renameFolder(dirPath) {
+    if (!supportsFileSystemAPI || !currentDirHandle) return;
+    const parts = dirPath.split('/');
+    const oldName = parts[parts.length - 1];
+    const parentPath = parts.slice(0, -1).join('/');
+    
+    const newName = prompt(currentLang === 'fr' ? "Nouveau nom du dossier :" : "New folder name:", oldName);
+    if (!newName || newName === oldName) return;
+    if (!/^[a-zA-Z0-9_\- ]+$/.test(newName)) {
+        alert(currentLang === 'fr' ? "Nom de dossier invalide." : "Invalid folder name.");
+        return;
+    }
+
+    try {
+        const parentHandle = await getDirHandleFromPath(parentPath);
+        const sourceHandle = await getDirHandleFromPath(dirPath);
+        
+        // 1. Crée le dossier cible avec le nouveau nom
+        const targetHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
+        
+        // 2. Copie récursivement tout le contenu
+        await copyDirectoryHelper(sourceHandle, targetHandle);
+        
+        // 3. Supprime l'ancien répertoire
+        await parentHandle.removeEntry(oldName, { recursive: true });
+        
+        // 4. Mémorise le chemin relatif du fichier ouvert actuellement
+        let activeRelPath = "";
+        if (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+            activeRelPath = folderFiles[activeFolderFileIndex].name;
+        }
+        
+        // 5. Met à jour l'arbre de fichiers
+        await readDirectory(currentDirHandle);
+        
+        // 6. Restaure la sélection active si elle faisait partie du dossier renommé
+        if (activeRelPath) {
+            const oldPrefix = dirPath + '/';
+            const newPrefix = parentPath ? `${parentPath}/${newName}/` : `${newName}/`;
+            if (activeRelPath.startsWith(oldPrefix)) {
+                const updatedRelPath = activeRelPath.replace(oldPrefix, newPrefix);
+                const newIdx = folderFiles.findIndex(f => f.name === updatedRelPath);
+                if (newIdx !== -1) {
+                    selectFolderFile(newIdx);
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Error renaming folder:", err);
+        alert(currentLang === 'fr' ? "Erreur lors du renommage du dossier." : "Error renaming folder.");
+    }
 }
 
 // --- UI Rendering ---
 
 function renderMatches(highlightIndex = -1) {
     dom.matchesList.innerHTML = '';
+    if (isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
+        const activeFile = folderFiles[activeFolderFileIndex];
+        
+        if (activeFile.hasParseError) {
+            dom.matchesList.innerHTML = `
+                <div class="error-state">
+                    <div class="error-state-header">
+                        <span class="error-icon">⚠️</span>
+                        <h3>Erreur de lecture YAML</h3>
+                    </div>
+                    <p class="error-desc">Ce fichier contient des erreurs de syntaxe ou un format non supporté par l'éditeur visuel. Vous pouvez le corriger manuellement dans l'éditeur de texte à droite.</p>
+                    <pre class="error-log">${escapeHtml(activeFile.parseErrorMessage)}</pre>
+                </div>
+            `;
+            renderSidebar(highlightIndex);
+            return;
+        }
+        
+        activeFile.matches = currentMatches;
+    }
+    
     renderSidebar(highlightIndex);
-
     if (!currentMatches || currentMatches.length === 0) {
         dom.matchesList.innerHTML = `<div class="empty-state"><p>${t('noMatchesFound')}</p></div>`;
         return;
     }
-
     currentMatches.forEach((match, index) => {
         const card = createMatchCard(match, index);
-        if (index === highlightIndex) {
-            card.classList.add('selected');
-        }
+        if (index === highlightIndex) card.classList.add('selected');
         dom.matchesList.appendChild(card);
     });
-
     if (highlightIndex !== -1) {
         const selectedEl = dom.matchesList.children[highlightIndex];
-        if (selectedEl) {
-            selectedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (selectedEl) selectedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
 
 function renderSidebar(highlightIndex = -1) {
     if (!dom.sidebarList) return;
     dom.sidebarList.innerHTML = '';
-
-    if (!currentMatches || currentMatches.length === 0) {
-        return;
-    }
-
-    currentMatches.forEach((match, index) => {
-        const item = document.createElement('div');
-        item.className = 'sidebar-item';
-        item.draggable = true;
-        if (index === highlightIndex) {
-            item.classList.add('selected');
+    if (isFolderMode) {
+        const filesHeader = document.createElement('div'); filesHeader.className = 'sidebar-section-header';
+        const filesHeaderLabel = document.createElement('span'); filesHeaderLabel.innerText = t('sidebarFiles'); filesHeader.appendChild(filesHeaderLabel);
+        const fileSortBtn = document.createElement('button'); fileSortBtn.className = 'btn-icon sort-file-btn';
+        fileSortBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path></svg>`;
+        fileSortBtn.title = currentLang === 'fr' ? 'Trier les fichiers' : 'Sort files';
+        fileSortBtn.addEventListener('click', (e) => { e.stopPropagation(); sortFilesAlphabetically(); });
+        filesHeader.appendChild(fileSortBtn);
+        dom.btnSortFiles = fileSortBtn;
+        dom.sidebarList.appendChild(filesHeader);
+        if (!supportsFileSystemAPI) {
+            const fallbackBanner = document.createElement('div'); fallbackBanner.className = 'sidebar-fallback-banner';
+            fallbackBanner.innerHTML = `<span class="fallback-icon">💡</span> ${currentLang === 'fr' ? 'Pour gérer les fichiers, utilisez Chrome ou Edge.' : 'To manage files, use Chrome or Edge.'}`;
+            dom.sidebarList.appendChild(fallbackBanner);
         }
-        item.innerText = match.trigger || `(Match ${index + 1})`;
-        item.title = match.trigger;
+        const filesContainer = document.createElement('div'); filesContainer.className = 'sidebar-files-list';
+        const tree = buildFileTree(folderFiles); const treeEl = document.createElement('div'); treeEl.className = 'file-tree';
 
-        // Navigation
-        item.onclick = (e) => {
-            e.stopPropagation();
-            renderMatches(index);
-        };
+        function renderTreeNode(node, level = 0) {
+            const sortedDirNames = Object.keys(node.children).sort((a, b) => a.localeCompare(b) * fileSortDirection);
+            sortedDirNames.forEach(dirName => {
+                const dir = node.children[dirName]; const dirEl = document.createElement('div'); dirEl.className = 'sidebar-dir-header';
+                dirEl.style.paddingLeft = `${8 + level * 16}px`; dirEl.title = dirName;
+                
+                // Wrapper de texte pour l'alignement
+                const textWrapper = document.createElement('div');
+                textWrapper.className = 'sidebar-item-text';
+                
+                const arrowSpan = document.createElement('span'); arrowSpan.className = 'dir-arrow'; arrowSpan.innerText = dir.expanded ? '▼' : '▶'; textWrapper.appendChild(arrowSpan);
+                const folderIcon = document.createElement('span'); folderIcon.className = 'dir-icon'; folderIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`; textWrapper.appendChild(folderIcon);
+                const dirNameSpan = document.createElement('span'); dirNameSpan.className = 'dir-name'; dirNameSpan.innerText = dirName; textWrapper.appendChild(dirNameSpan);
+                dirEl.appendChild(textWrapper);
 
-        // Drag events
-        item.addEventListener('dragstart', (e) => handleDragStart(e, index));
-        item.addEventListener('dragover', handleDragOver);
-        item.addEventListener('dragleave', handleDragLeave);
-        item.addEventListener('drop', (e) => handleDrop(e, index));
-        item.addEventListener('dragend', handleDragEnd);
+                const getFullDirPath = (d) => { const parts = []; let cur = d; while (cur.name) { parts.unshift(cur.name); cur = cur.parent; } return parts.join('/'); };
+                const dirFullPath = getFullDirPath(dir);
 
-        dom.sidebarList.appendChild(item);
+                // Ajout des boutons d'action du dossier (Renommer / Supprimer)
+                if (supportsFileSystemAPI) {
+                    const actionWrapper = document.createElement('div');
+                    actionWrapper.className = 'sidebar-item-actions';
+                    
+                    const renameBtn = document.createElement('button');
+                    renameBtn.className = 'sidebar-action-btn';
+                    renameBtn.innerHTML = '✏️';
+                    renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                    renameBtn.onclick = (e) => { e.stopPropagation(); renameFolder(dirFullPath); };
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'sidebar-action-btn delete-btn';
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                    deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFolder(dirFullPath); };
+                    
+                    actionWrapper.appendChild(renameBtn);
+                    actionWrapper.appendChild(deleteBtn);
+                    dirEl.appendChild(actionWrapper);
+                    
+                    dirEl.addEventListener('dragover', handleFileDragOver); 
+                    dirEl.addEventListener('dragleave', handleFileDragLeave); 
+                    dirEl.addEventListener('drop', (e) => handleFileDropOnDir(e, dirFullPath)); 
+                }
+
+                dirEl.onclick = (e) => { e.stopPropagation(); dir.expanded = !dir.expanded; expandedFolders[dirFullPath] = dir.expanded; renderSidebar(highlightIndex); };
+                treeEl.appendChild(dirEl);
+                if (dir.expanded) {
+                    dir.files.forEach(f => {
+                        const fileIndexInFolderFiles = folderFiles.indexOf(f); if (fileIndexInFolderFiles === -1) return;
+                        const item = document.createElement('div'); item.className = 'sidebar-file-item'; if (fileIndexInFolderFiles === activeFolderFileIndex) item.classList.add('selected');
+                        item.style.paddingLeft = `${8 + (level + 1) * 16}px`;
+                        
+                        const fileTextWrapper = document.createElement('div');
+                        fileTextWrapper.className = 'sidebar-item-text';
+                        
+                        fileTextWrapper.innerHTML = `<svg class="file-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+                        const nameSpan = document.createElement('span'); nameSpan.className = 'file-name'; nameSpan.innerText = f.name.split('/').pop(); fileTextWrapper.appendChild(nameSpan);
+                        
+                        if (f.hasParseError) {
+                            const errIndicator = document.createElement('span');
+                            errIndicator.className = 'parse-error-indicator';
+                            errIndicator.innerText = ' ⚠️';
+                            errIndicator.title = f.parseErrorMessage;
+                            fileTextWrapper.appendChild(errIndicator);
+                        }
+                        
+                        if (f.isModified) { const modIndicator = document.createElement('span'); modIndicator.className = 'modified-dot'; modIndicator.innerText = '●'; fileTextWrapper.appendChild(modIndicator); }
+                        item.appendChild(fileTextWrapper);
+
+                        // Actions du fichier (Renommer / Supprimer)
+                        if (supportsFileSystemAPI) {
+                            const actionWrapper = document.createElement('div');
+                            actionWrapper.className = 'sidebar-item-actions';
+                            
+                            const renameBtn = document.createElement('button');
+                            renameBtn.className = 'sidebar-action-btn';
+                            renameBtn.innerHTML = '✏️';
+                            renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                            renameBtn.onclick = (e) => { e.stopPropagation(); renameFile(fileIndexInFolderFiles); };
+                            
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'sidebar-action-btn delete-btn';
+                            deleteBtn.innerHTML = '🗑️';
+                            deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                            deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFile(fileIndexInFolderFiles); };
+                            
+                            actionWrapper.appendChild(renameBtn);
+                            actionWrapper.appendChild(deleteBtn);
+                            item.appendChild(actionWrapper);
+                            
+                            item.draggable = true; 
+                            item.addEventListener('dragstart', (e) => handleFileDragStart(e, fileIndexInFolderFiles)); 
+                            item.addEventListener('dragend', fileDragEnd); 
+                            item.addEventListener('dragover', handleFileDragOver); 
+                            item.addEventListener('dragleave', handleFileDragLeave); 
+                            item.addEventListener('drop', (e) => handleFileDrop(e, fileIndexInFolderFiles)); 
+                        }
+
+                        item.onclick = (e) => { e.stopPropagation(); selectFolderFile(fileIndexInFolderFiles); };
+                        treeEl.appendChild(item);
+                    });
+                    renderTreeNode(dir, level + 1);
+                }
+            });
+            if (level === 0) {
+                node.files.forEach(f => {
+                    const fileIndexInFolderFiles = folderFiles.indexOf(f); if (fileIndexInFolderFiles === -1) return;
+                    const item = document.createElement('div'); item.className = 'sidebar-file-item'; if (fileIndexInFolderFiles === activeFolderFileIndex) item.classList.add('selected');
+                    item.style.paddingLeft = `${8}px`;
+                    
+                    const fileTextWrapper = document.createElement('div');
+                    fileTextWrapper.className = 'sidebar-item-text';
+                    
+                    fileTextWrapper.innerHTML = `<svg class="file-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+                    const nameSpan = document.createElement('span'); nameSpan.className = 'file-name'; nameSpan.innerText = f.name; fileTextWrapper.appendChild(nameSpan);
+                    
+                    if (f.hasParseError) {
+                        const errIndicator = document.createElement('span');
+                        errIndicator.className = 'parse-error-indicator';
+                        errIndicator.innerText = ' ⚠️';
+                        errIndicator.title = f.parseErrorMessage;
+                        fileTextWrapper.appendChild(errIndicator);
+                    }
+                    
+                    if (f.isModified) { const modIndicator = document.createElement('span'); modIndicator.className = 'modified-dot'; modIndicator.innerText = '●'; fileTextWrapper.appendChild(modIndicator); }
+                    item.appendChild(fileTextWrapper);
+
+                    // Actions du fichier racine (Renommer / Supprimer)
+                    if (supportsFileSystemAPI) {
+                        const actionWrapper = document.createElement('div');
+                        actionWrapper.className = 'sidebar-item-actions';
+                        
+                        const renameBtn = document.createElement('button');
+                        renameBtn.className = 'sidebar-action-btn';
+                        renameBtn.innerHTML = '✏️';
+                        renameBtn.title = currentLang === 'fr' ? 'Renommer' : 'Rename';
+                        renameBtn.onclick = (e) => { e.stopPropagation(); renameFile(fileIndexInFolderFiles); };
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'sidebar-action-btn delete-btn';
+                        deleteBtn.innerHTML = '🗑️';
+                        deleteBtn.title = currentLang === 'fr' ? 'Supprimer' : 'Delete';
+                        deleteBtn.onclick = (e) => { e.stopPropagation(); deleteFile(fileIndexInFolderFiles); };
+                        
+                        actionWrapper.appendChild(renameBtn);
+                        actionWrapper.appendChild(deleteBtn);
+                        item.appendChild(actionWrapper);
+                        
+                        item.draggable = true; 
+                        item.addEventListener('dragstart', (e) => handleFileDragStart(e, fileIndexInFolderFiles)); 
+                        item.addEventListener('dragend', fileDragEnd); 
+                        item.addEventListener('dragover', handleFileDragOver); 
+                        item.addEventListener('dragleave', handleFileDragLeave); 
+                        item.addEventListener('drop', (e) => handleFileDrop(e, fileIndexInFolderFiles)); 
+                    }
+
+                    item.onclick = (e) => { e.stopPropagation(); selectFolderFile(fileIndexInFolderFiles); };
+                    treeEl.appendChild(item);
+                });
+            }
+        }
+        renderTreeNode(tree, 0);
+        filesContainer.appendChild(treeEl);
+        dom.sidebarList.appendChild(filesContainer);
+        
+        // Triggers section
+        const triggersHeader = document.createElement('div'); triggersHeader.className = 'sidebar-section-header';
+        const triggersHeaderLabel = document.createElement('span'); triggersHeaderLabel.innerText = t('sidebarTriggers'); triggersHeader.appendChild(triggersHeaderLabel);
+        const matchSortBtn = document.createElement('button'); matchSortBtn.className = 'btn-icon sort-match-btn';
+        const initArrow = sortDirection === 1 ? `<path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="M3 17l3 3 3-3"></path><path d="M6 18V4"></path>` : `<path d="M3 7l3-3 3 3"></path><path d="M6 4v16"></path><path d="M11 19h10"></path><path d="M11 15h7"></path><path d="M11 11h4"></path>`;
+        matchSortBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${initArrow}</svg>`;
+        matchSortBtn.title = t('btnSortAlpha');
+        matchSortBtn.addEventListener('click', (e) => { e.stopPropagation(); sortMatchesAlphabetically(); });
+        triggersHeader.appendChild(matchSortBtn);
+        dom.btnSortAlpha = matchSortBtn;
+        dom.sidebarList.appendChild(triggersHeader);
+    }
+    if (!currentMatches || currentMatches.length === 0) return;
+    const triggersContainer = document.createElement('div'); triggersContainer.className = 'sidebar-triggers-list';
+    currentMatches.forEach((match, index) => {
+        const item = document.createElement('div'); item.className = 'sidebar-item'; item.draggable = true;
+        if (index === highlightIndex) item.classList.add('selected');
+        item.innerText = match.trigger || `(Match ${index + 1})`; item.title = match.trigger;
+        item.onclick = (e) => { e.stopPropagation(); renderMatches(index); };
+        item.addEventListener('dragstart', (e) => handleDragStart(e, index)); item.addEventListener('dragover', handleDragOver); item.addEventListener('dragleave', handleDragLeave); item.addEventListener('drop', (e) => handleDrop(e, index)); item.addEventListener('dragend', handleDragEnd);
+        triggersContainer.appendChild(item);
     });
+    dom.sidebarList.appendChild(triggersContainer);
 }
 
 function createMatchCard(match, index) {
-    const el = document.createElement('div');
-    el.className = 'match-card';
-    el.onclick = () => openEditor(index);
-
+    const el = document.createElement('div'); el.className = 'match-card'; el.onclick = () => openEditor(index);
     let type = t('typeSimple');
     let contentPreview = match.replace;
 
-    if (match.form) {
-        type = t('typeForm');
-        contentPreview = match.form;
-    } else if (match.vars && match.vars.some(v => v.type === 'date')) {
-        type = t('typeDate');
+    if (match.markdown || match.html) {
+        type = t('typeRich');
+        contentPreview = match.replace;
+    } else if (match.form) {
+        type = t('typeInteractive');
+        contentPreview = match.form.replace(/\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g, '{{$1}}');
+    } else if (match.vars) {
+        const formVar = match.vars.find(v => v.type === 'form');
+        if (formVar) {
+            type = t('typeInteractive');
+            const formVarName = formVar.name || 'form1';
+            const regex = new RegExp(`\\{\\{\\s*${formVarName}\\.([a-zA-Z0-9_\\-]+)\\s*\\\}\\}`, 'g');
+            contentPreview = (match.replace || '').replace(regex, '{{$1}}');
+        } else if (match.vars.some(v => v.type === 'date')) {
+            type = t('typeDate');
+        } else {
+            type = t('typeInteractive');
+        }
     }
 
-    if (contentPreview && contentPreview.length > 150) {
-        contentPreview = contentPreview.substring(0, 150) + '...';
-    }
-
-    el.innerHTML = `
-        <div class="match-header">
-            <span class="trigger-badge">${escapeHtml(match.trigger)}</span>
-            <span class="type-badge">${type}</span>
-        </div>
-        <div class="match-content">${escapeHtml(contentPreview || t('dynamicContent'))}</div>
-    `;
-
+    if (contentPreview && contentPreview.length > 150) contentPreview = contentPreview.substring(0, 150) + '...';
+    el.innerHTML = `<div class="match-header"><span class="trigger-badge">${escapeHtml(match.trigger)}</span><span class="type-badge">${type}</span></div><div class="match-content">${escapeHtml(contentPreview || t('dynamicContent'))}</div>`;
     return el;
 }
 
-function escapeHtml(text) {
-    if (!text) return '';
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+function escapeHtml(text) { if (!text) return ''; const el = document.createElement('div'); el.appendChild(document.createTextNode(text)); return el.innerHTML; }
 
-
-// --- Editor Logic ---
-
-let editingIndex = -1;
-let editorBuffers = { simple: '', form: '', date: '{{mydate}}' };
-let lastEditorType = 'simple';
-let isPopulating = false;
+// ========== UNIFIED EDITOR LOGIC ==========
 
 function openEditor(index = -1) {
     editingIndex = index;
     dom.editorModal.classList.remove('hidden');
-
-    // Reset handlers
     dom.btnSaveMatch.onclick = saveMatchFromEditor;
     dom.btnDeleteMatch.onclick = deleteMatchFromEditor;
-
-    // Initialize session buffers
-    editorBuffers = { simple: '', form: '', date: '{{mydate}}' };
-    lastEditorType = 'simple';
     isPopulating = true;
 
     if (index === -1) {
         dom.modalTitle.innerText = t('newMatch');
         dom.btnDeleteMatch.classList.add('hidden');
-        dom.typeOverlay.classList.remove('hidden'); // Show selection first
-        setMatchType('simple');
+        dom.typeOverlay.classList.remove('hidden');
         resetEditorFields();
     } else {
         dom.modalTitle.innerText = t('editMatch');
         dom.btnDeleteMatch.classList.remove('hidden');
-        dom.typeOverlay.classList.add('hidden'); // Hide selection
+        dom.typeOverlay.classList.add('hidden');
         populateEditor(currentMatches[index]);
     }
     isPopulating = false;
@@ -859,398 +1591,804 @@ function closeEditor() {
 function resetEditorFields() {
     dom.triggerInput.value = '';
     dom.contentInput.value = '';
-    dom.dateFormat.value = '%d/%m/%Y';
-
-    // Clear Visual Builder
-    dom.fieldsList.innerHTML = '';
-
+    if (dom.dateFormatDefault) dom.dateFormatDefault.value = '%d/%m/%Y';
     setMatchType('simple');
-    updateEditorFields();
+    clearVarsConfig();
+    updateEditorUI();
 }
 
 function setMatchType(type) {
-    Array.from(dom.typeRadios).forEach(r => {
-        r.checked = (r.value === type);
-    });
+    activeMatchType = type;
 }
 
 function getMatchType() {
-    return Array.from(dom.typeRadios).find(r => r.checked)?.value || 'simple';
+    return activeMatchType;
 }
 
-function updateEditorFields() {
+function clearVarsConfig() {
+    if (dom.varsConfigList) dom.varsConfigList.innerHTML = '';
+    if (dom.varsConfigPanel) dom.varsConfigPanel.classList.add('hidden');
+    if (dom.dateFormatConfig) dom.dateFormatConfig.classList.add('hidden');
+}
+
+// --- Update the unified editor UI based on type ---
+function updateEditorUI() {
     const type = getMatchType();
 
-    // Buffering Logic: Save current text to the buffer of the type we just LEFT
-    if (!isPopulating && lastEditorType !== type) {
-        editorBuffers[lastEditorType] = dom.contentInput.value;
-        // Restore/Set text for the NEW type
-        dom.contentInput.value = editorBuffers[type] || (type === 'date' ? '{{mydate}}' : '');
+    const formatGroup = document.querySelector('.unified-format-group');
+    if (formatGroup) {
+        formatGroup.classList.toggle('hidden', type !== 'rich');
     }
-    lastEditorType = type;
 
+    if (dom.unifiedModeToggle) {
+        dom.unifiedModeToggle.classList.toggle('hidden', type !== 'rich');
+    }
 
-    // Default visibility
-    dom.contentSection.classList.remove('hidden');
-    dom.formFieldsSection.classList.add('hidden');
-    dom.dateSection.classList.add('hidden');
-    dom.contentHelp.innerText = t('contentHelp');
+    const insertGroup = document.querySelector('.unified-insert-group');
+    if (insertGroup) {
+        insertGroup.classList.toggle('hidden', type !== 'interactive');
+    }
 
     if (type === 'date') {
-        dom.contentLabel.innerText = t('contentLabelDate');
-        dom.contentSection.classList.remove('hidden');
-        dom.dateSection.classList.remove('hidden');
-        dom.contentHelp.innerText = t('contentHelpDate');
-    } else if (type === 'form') {
-        dom.contentLabel.innerText = t('contentLabelForm');
-        dom.contentHelp.innerText = t('contentHelpForm');
-        dom.formFieldsSection.classList.remove('hidden');
+        if (!dom.contentInput.value) {
+            dom.contentInput.value = '{{mydate}}';
+        }
+        dom.contentInput.readOnly = false;
+        dom.contentInput.style.backgroundColor = '';
+        dom.contentInput.style.cursor = '';
     } else {
-        dom.contentLabel.innerText = t('contentLabelReplacement');
+        dom.contentInput.readOnly = false;
+        dom.contentInput.style.backgroundColor = '';
+        dom.contentInput.style.cursor = '';
+        if (dom.contentInput.value === '{{mydate}}') {
+            dom.contentInput.value = '';
+        }
     }
 
-    // Update form preview visibility
-    updateFormPreview();
-    updateDatePreview();
-}
-
-function populateEditor(match) {
-    dom.triggerInput.value = match.trigger;
-
-    let type = 'simple';
-    if (match.form) {
-        type = 'form';
-        dom.contentInput.value = match.form;
-
-        // Populate Visual Builder
-        dom.fieldsList.innerHTML = '';
-        if (match.form_fields) {
-            Object.keys(match.form_fields).forEach(key => {
-                const fieldData = match.form_fields[key];
-                addFieldRow(key, fieldData);
-            });
-        }
+    if (type === 'interactive' || type === 'date') {
+        syncVarsFromText();
     } else {
-        dom.contentInput.value = match.replace;
-        if (match.vars) {
-            const dateVar = match.vars.find(v => v.type === 'date');
-
-            if (dateVar) {
-                type = 'date';
-                if (dateVar.params && dateVar.params.format) {
-                    dom.dateFormat.value = dateVar.params.format;
-                }
-            }
-        }
+        clearVarsConfig();
     }
 
-    setMatchType(type);
+    if (dom.varsConfigPanel) {
+        dom.varsConfigPanel.classList.toggle('hidden', (type !== 'interactive' && type !== 'date'));
+    }
 
-    // Fill the specific buffer for the loaded type
-    editorBuffers[type] = dom.contentInput.value;
+    // Maintient le bloc de format global masqué
+    if (dom.dateFormatConfig) {
+        dom.dateFormatConfig.classList.add('hidden');
+    }
 
-    updateEditorFields();
+    updatePreview();
 }
 
-// --- Visual Builder Logic ---
+// --- INSERT VARIABLE INTO TEXT ---
 
-function addFieldRow(name = '', data = null) {
-    const template = dom.fieldRowTemplate.content.cloneNode(true);
-    const row = template.querySelector('.field-row');
-
-    const nameInput = row.querySelector('.field-name');
-    const typeSelect = row.querySelector('.field-type');
-    const valuesInput = row.querySelector('.field-values');
-    const removeBtn = row.querySelector('.remove-field');
-
-    // Remove Handler
-    removeBtn.onclick = () => {
-        row.remove();
-        updateFormPreview();
-    };
-
-    // Auto-generate name if not provided (for new fields)
-    if (!name || typeof name !== 'string') {
-        // Count existing fields to generate unique name
-        const existingFields = dom.fieldsList.querySelectorAll('.field-row');
-        let counter = existingFields.length + 1;
-        let proposedName = `field${counter}`;
-
-        // Check if name already exists
-        const existingNames = Array.from(existingFields).map(r =>
-            r.querySelector('.field-name').value.trim()
-        );
-
-        while (existingNames.includes(proposedName)) {
-            counter++;
-            proposedName = `field${counter}`;
-        }
-
-        name = proposedName;
-    }
-
-    nameInput.value = name;
-
-    if (data) {
-        if (data.type) typeSelect.value = data.type;
-
-        // Handle multiline which translates to a specific UI type
-        if (data.multiline) {
-            typeSelect.value = 'text_multiline';
-        }
-
-        // Handle date type for form fields
-        if (data.type === 'date') {
-            typeSelect.value = 'date';
-        }
-
-        if (data.format) {
-            valuesInput.value = data.format;
-        }
-
-        // Handle values which might be an array in YAML object
-        if (Array.isArray(data.values)) {
-            valuesInput.value = data.values.join('\n');
-        } else if (typeof data.values === 'string') {
-            // If user previously used text block with pipes, try to normalize
-            // Espanso usually expects list, but let's just show text
-            valuesInput.value = data.values;
-        }
-    }
-
-    // Handle visibility of values based on type
-    let lastType = typeSelect.value;
-    const toggleValues = () => {
-        const type = typeSelect.value;
-        const needsValues = (type === 'choice' || type === 'list');
-        const isDate = (type === 'date');
-
-        // Clear value if switching between incompatible uses of the values field
-        if (lastType !== type) {
-            const wasDate = (lastType === 'date');
-            const wasSelection = (lastType === 'choice' || lastType === 'list');
-
-            if ((wasDate && needsValues) || (isDate && wasSelection)) {
-                valuesInput.value = '';
-            }
-            lastType = type;
-        }
-
-        valuesInput.parentElement.style.visibility = (needsValues || isDate) ? 'visible' : 'hidden';
-
-        if (isDate) {
-            valuesInput.parentElement.style.visibility = 'visible';
-            valuesInput.placeholder = "%d/%m/%Y";
-            // Find the label for values and change it
-            const label = valuesInput.parentElement.querySelector('label');
-            if (label) label.innerText = t('dateFormatLabel');
-
-            // Add date format reminder if not present
-            let hint = valuesInput.parentElement.querySelector('.date-hint');
-            if (!hint) {
-                hint = document.createElement('small');
-                hint.className = 'date-hint';
-                hint.style.display = 'block';
-                hint.style.marginTop = '4px';
-                hint.style.fontSize = '0.75rem';
-                hint.style.color = 'var(--text-secondary)';
-                hint.setAttribute('data-i18n', 'dateHint');
-                hint.innerHTML = t('dateHint');
-                valuesInput.parentElement.appendChild(hint);
-            }
-            hint.style.display = 'block';
-        } else {
-            const label = valuesInput.parentElement.querySelector('label');
-            if (label) label.innerText = t('fieldValues');
-            const hint = valuesInput.parentElement.querySelector('.date-hint');
-            if (hint) hint.style.display = 'none';
-        }
-
-        if (!needsValues && !isDate) valuesInput.value = '';
-    };
-    typeSelect.addEventListener('change', toggleValues);
-    toggleValues(); // Init
-
-    // Add event listeners for live preview updates
-    nameInput.addEventListener('input', updateFormPreview);
-    typeSelect.addEventListener('change', updateFormPreview);
-    valuesInput.addEventListener('input', updateFormPreview);
-
-    dom.fieldsList.appendChild(row);
-
-    // Auto-insert [[fieldname]] into content if this is a new field (not from existing data)
-    if (!data && getMatchType() === 'form') {
-        const currentContent = dom.contentInput.value;
-        if (currentContent.length > 0 && !currentContent.endsWith('\n')) {
-            dom.contentInput.value += '\n';
-        }
-        dom.contentInput.value += `${name}: [[${name}]]`;
-        updateFormPreview();
-    }
+function getUniqueVarName(baseName) {
+    const text = dom.contentInput.value;
+    const regex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const existing = [];
+    let match;
+    while ((match = regex.exec(text)) !== null) existing.push(match[1]);
+    let counter = 1;
+    let name = baseName;
+    while (existing.includes(name)) { name = `${baseName}_${counter}`; counter++; }
+    return name;
 }
 
-function getFormFieldsFromUI() {
-    const fields = {};
-    const rows = dom.fieldsList.querySelectorAll('.field-row');
-    const usedNames = new Set();
+function insertVariable(variableType) {
+    const name = getUniqueVarName(variableType === 'text' ? 'mon_texte' : variableType === 'choice' ? 'mon_choix' : variableType === 'list' ? 'ma_liste' : 'mon_texte');
+    const textarea = dom.contentInput;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const textToInsert = `{{${name}}}`;
+    textarea.value = text.substring(0, start) + textToInsert + text.substring(end);
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
 
+    syncVarsFromText();
+
+    const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
     rows.forEach(row => {
-        let name = row.querySelector('.field-name').value.trim();
-        const type = row.querySelector('.field-type').value;
-        const valuesText = row.querySelector('.field-values').value;
-
-        // Skip if somehow still empty (shouldn't happen with auto-generation at creation)
-        if (!name) {
-            console.warn('Field without name detected, skipping.');
-            return;
-        }
-
-        // Handle duplicates by renaming
-        if (usedNames.has(name)) {
-            console.warn(`Duplicate field name "${name}" detected.`);
-            let counter = 2;
-            let uniqueName = `${name}_${counter}`;
-            while (usedNames.has(uniqueName)) {
-                counter++;
-                uniqueName = `${name}_${counter}`;
+        const rowName = row.dataset.varName;
+        if (rowName === name) {
+            const typeSelect = row.querySelector('.var-type-select');
+            if (typeSelect) {
+                const typeMap = { 'text': 'static', 'choice': 'choice', 'list': 'list', 'multiline': 'multiline' };
+                typeSelect.value = typeMap[variableType] || 'static';
+                typeSelect.dispatchEvent(new Event('change'));
             }
-            name = uniqueName;
-            row.querySelector('.field-name').value = name;
-        }
-
-        usedNames.add(name);
-
-        if (type === 'text_multiline') {
-            fields[name] = {
-                type: 'text',
-                multiline: true
-            };
-        } else if (type === 'choice' || type === 'list') {
-            // Convert text lines to array for YAML
-            const valuesArray = valuesText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-            // Skip if no values provided for choice/list
-            if (valuesArray.length === 0) {
-                console.warn(`Field "${name}" of type "${type}" has no values, skipping.`);
-                return;
-            }
-
-            fields[name] = {
-                type: type,
-                values: valuesArray
-            };
-        } else if (type === 'date') {
-            fields[name] = {
-                type: 'date',
-                format: valuesText.trim() || '%d/%m/%Y'
-            };
-        } else {
-            // For other types (like 'text'), no values needed
-            fields[name] = {
-                type: type
-            };
         }
     });
 
-    return fields; // Return empty object if no fields, not null (easier for merging)
+    updatePreview();
 }
 
+// --- SYNC VARS FROM TEXT ---
 
-// --- Saving Logic ---
+function syncVarsFromText() {
+    const content = dom.contentInput.value || '';
+    const regex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const detectedVars = [];
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+        const varName = match[1];
+        if (!detectedVars.includes(varName)) detectedVars.push(varName);
+    }
+
+    // Le formatage se faisant par variable, le bloc global reste masqué
+    if (dom.dateFormatConfig) {
+        dom.dateFormatConfig.classList.add('hidden');
+    }
+
+    const currentRows = dom.varsConfigList.querySelectorAll('.var-config-row');
+    const existingNames = Array.from(currentRows).map(row => row.dataset.varName);
+
+    currentRows.forEach(row => {
+        if (!detectedVars.includes(row.dataset.varName)) {
+            row.remove();
+        }
+    });
+
+    detectedVars.forEach(varName => {
+        if (!existingNames.includes(varName)) {
+            addVarConfigRow(varName);
+        }
+    });
+
+    if (dom.varsConfigPanel) {
+        dom.varsConfigPanel.classList.toggle('hidden', detectedVars.length === 0);
+    }
+
+    updatePreview();
+}
+
+// --- Add configuration row for a variable ---
+function addVarConfigRow(varName) {
+    const template = dom.varConfigRowTemplate;
+    if (!template) return;
+    const clone = template.content.cloneNode(true);
+    const row = clone.querySelector('.var-config-row');
+    row.dataset.varName = varName;
+    row.querySelector('.var-config-name').innerText = `{{${varName}}}`;
+
+    const typeSelect = row.querySelector('.var-type-select');
+    const staticField = row.querySelector('.var-static-field');
+    const multilineField = row.querySelector('.var-multiline-field');
+    const optionsField = row.querySelector('.var-options-field');
+    const dateField = row.querySelector('.var-date-field');
+    const defaultInput = row.querySelector('.var-default-value');
+    const multilineInput = row.querySelector('.var-default-value-multiline');
+    const dateFormatInput = row.querySelector('.var-date-format');
+    const addOptionBtn = row.querySelector('.var-add-option-btn');
+    const optionsList = row.querySelector('.var-options-list');
+
+    const updateFieldVisibility = () => {
+        const type = typeSelect.value;
+        staticField.classList.toggle('hidden', type !== 'static');
+        multilineField.classList.toggle('hidden', type !== 'multiline');
+        if (optionsField) {
+            optionsField.classList.toggle('hidden', type !== 'choice' && type !== 'list');
+        }
+        dateField.classList.toggle('hidden', type !== 'date');
+
+        if ((type === 'choice' || type === 'list') && optionsList && optionsList.children.length === 0) {
+            addVarOptionRow(optionsList, 'Option 1', 'Valeur 1');
+            addVarOptionRow(optionsList, 'Option 2', 'Valeur 2');
+        }
+    };
+
+    typeSelect.addEventListener('change', () => {
+        updateFieldVisibility();
+        updatePreview();
+    });
+
+    // Force l'affichage et le type en 'date' si le match parent est de type 'date'
+    const matchType = getMatchType();
+    if (matchType === 'date') {
+        typeSelect.value = 'date';
+        typeSelect.disabled = true;
+        const typeContainer = row.querySelector('.var-config-type');
+        if (typeContainer) typeContainer.classList.add('hidden');
+    }
+
+    if (defaultInput) defaultInput.addEventListener('input', updatePreview);
+    if (multilineInput) multilineInput.addEventListener('input', updatePreview);
+    if (dateFormatInput) dateFormatInput.addEventListener('input', updatePreview);
+
+    if (addOptionBtn) {
+        addOptionBtn.addEventListener('click', () => {
+            addVarOptionRow(optionsList, '', '');
+            updatePreview();
+        });
+    }
+
+    const toggleBtn = row.querySelector('.var-options-toggle-btn');
+    const optionsTitle = row.querySelector('.var-options-header-title label');
+    if (toggleBtn && optionsField) {
+        const handleCollapse = (e) => {
+            e.preventDefault();
+            const isCollapsed = optionsField.classList.toggle('collapsed');
+            
+            if (optionsList) {
+                optionsList.style.setProperty('display', isCollapsed ? 'none' : 'flex', 'important');
+            }
+            
+            const icon = toggleBtn.querySelector('.toggle-icon');
+            if (icon) {
+                icon.style.transform = isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        };
+        toggleBtn.addEventListener('click', handleCollapse);
+        if (optionsTitle) {
+            optionsTitle.addEventListener('click', handleCollapse);
+        }
+    }
+
+    updateFieldVisibility();
+    dom.varsConfigList.appendChild(row);
+}
+
+// --- Add option row ---
+
+function addVarOptionRow(container, text = '', value = '') {
+    const template = dom.varOptionRowTemplate;
+    if (!template) return;
+    const clone = template.content.cloneNode(true);
+    const row = clone.querySelector('.var-option-row');
+    const textInput = row.querySelector('.var-option-text');
+    const valueInput = row.querySelector('.var-option-value');
+    const removeBtn = row.querySelector('.var-option-remove');
+
+    if (textInput) { textInput.value = text; textInput.addEventListener('input', updatePreview); }
+    if (valueInput) { valueInput.value = value; valueInput.addEventListener('input', updatePreview); }
+    if (removeBtn) { removeBtn.addEventListener('click', () => { row.remove(); updatePreview(); }); }
+
+    container.appendChild(row);
+}
+
+// --- Get vars config data from UI ---
+
+function getVarsConfig() {
+    const config = {};
+    const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
+    rows.forEach(row => {
+        const varName = row.dataset.varName;
+        const typeSelect = row.querySelector('.var-type-select');
+        const type = typeSelect ? typeSelect.value : 'static';
+
+        const defaultInput = row.querySelector('.var-default-value');
+        const multilineInput = row.querySelector('.var-default-value-multiline');
+        const dateFormatInput = row.querySelector('.var-date-format');
+
+        config[varName] = { type: type };
+
+        if (type === 'static') {
+            config[varName].value = defaultInput ? defaultInput.value : '';
+        } else if (type === 'multiline') {
+            config[varName].value = multilineInput ? multilineInput.value : '';
+            config[varName].multiline = true;
+        } else if (type === 'date') {
+            config[varName].format = dateFormatInput ? dateFormatInput.value : '%d/%m/%Y';
+        } else if (type === 'choice' || type === 'list') {
+            const optionsList = row.querySelector('.var-options-list');
+            const optionRows = optionsList ? optionsList.querySelectorAll('.var-option-row') : [];
+            const values = [];
+            optionRows.forEach(optRow => {
+                const optText = optRow.querySelector('.var-option-text').value.trim();
+                const optVal = optRow.querySelector('.var-option-value').value;
+                if (optText || optVal) {
+                    if (optText && optVal && optText !== optVal) {
+                        values.push({ text: optText, value: optVal });
+                    } else {
+                        values.push(optVal || optText);
+                    }
+                }
+            });
+            config[varName].values = values;
+        }
+    });
+    return config;
+}
+
+// --- PREVIEW ---
+
+function updatePreview() {
+    if (!dom.previewSection || !dom.previewContent) return;
+    const type = getMatchType();
+    const content = dom.contentInput.value || '';
+    const varsConfig = getVarsConfig();
+
+    const typeLabelMap = { simple: 'previewTypeSimple', rich: 'previewTypeRich', interactive: 'previewTypeInteractive', date: 'previewTypeDate' };
+    if (dom.previewTypeLabel) {
+        dom.previewTypeLabel.innerText = t(typeLabelMap[type] || 'previewTypeSimple');
+    }
+
+    if (!content) {
+        dom.previewContent.innerHTML = `<span class="preview-empty">${t('previewLabel')}</span>`;
+        return;
+    }
+
+    if (type === 'interactive') {
+        renderInteractiveDualPreview(content, varsConfig);
+    } else {
+        const renderedHTML = renderPreviewContent(content, type, varsConfig);
+        dom.previewContent.innerHTML = renderedHTML;
+        wirePreviewControls(content, varsConfig);
+    }
+}
+
+// --- DOUBLE APERÇU POUR LES FORMULAIRES ---
+
+function renderInteractiveDualPreview(content, varsConfig) {
+    const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+    const detectedVars = [];
+    let match;
+    while ((match = varRegex.exec(content)) !== null) {
+        const varName = match[1];
+        if (!detectedVars.includes(varName)) detectedVars.push(varName);
+    }
+
+    if (detectedVars.length === 0) {
+        dom.previewContent.innerHTML = `<div class="preview-empty">${t('noVarsDetected')}</div>`;
+        return;
+    }
+
+    // 1. Construit le formulaire de saisie de gauche
+    let formHtml = `<div class="preview-form-fields">`;
+    detectedVars.forEach(varName => {
+        const config = varsConfig[varName] || { type: 'static', value: '' };
+        formHtml += `<div class="preview-form-group">`;
+        formHtml += `<label>{{${escapeHtml(varName)}}}</label>`;
+
+        if (config.type === 'choice' || config.type === 'list') {
+            formHtml += `<select class="preview-form-input" data-var-name="${escapeHtml(varName)}">`;
+            const values = config.values || [];
+            values.forEach(v => {
+                if (typeof v === 'object' && v !== null) {
+                    formHtml += `<option value="${escapeHtml(v.value || '')}">${escapeHtml(v.text || v.value || '')}</option>`;
+                } else {
+                    formHtml += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+                }
+            });
+            formHtml += `</select>`;
+        } else if (config.type === 'date') {
+            const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+            const formattedDate = formatDateString(fmt);
+            formHtml += `<input type="text" class="preview-form-input" value="${escapeHtml(formattedDate)}" readonly style="background-color: #f3f4f6; cursor: not-allowed;">`;
+        } else if (config.type === 'multiline') {
+            formHtml += `<textarea class="preview-form-input" data-var-name="${escapeHtml(varName)}" rows="2" placeholder="${escapeHtml(config.value || '')}"></textarea>`;
+        } else {
+            formHtml += `<input type="text" class="preview-form-input" data-var-name="${escapeHtml(varName)}" value="${escapeHtml(config.value || '')}" placeholder="${escapeHtml(config.value || '')}">`;
+        }
+        formHtml += `</div>`;
+    });
+    formHtml += `</div>`;
+
+    // 2. Insère la structure duale (Formulaire / Résultat)
+    dom.previewContent.innerHTML = `
+        <div class="interactive-preview-container">
+            <div class="preview-form-block">
+                <div class="preview-sublabel">${t('formPreviewTitle')}</div>
+                ${formHtml}
+            </div>
+            <div class="preview-result-block">
+                <div class="preview-sublabel">${t('resultPreviewTitle')}</div>
+                <div class="preview-result-text" id="previewResultText"></div>
+            </div>
+        </div>
+    `;
+
+    // 3. Logique de remplacement et de mise à jour dynamique du résultat obtenu
+    const updateResultText = () => {
+        const resultTextEl = dom.previewContent.querySelector('#previewResultText');
+        if (!resultTextEl) return;
+
+        let output = content;
+
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { type: 'static', value: '' };
+            let val = '';
+
+            if (config.type === 'date') {
+                const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+                val = formatDateString(fmt);
+            } else {
+                const inputEl = dom.previewContent.querySelector(`.preview-form-input[data-var-name="${varName}"]`);
+                if (inputEl) {
+                    val = inputEl.value;
+                    if (!val) {
+                        val = inputEl.placeholder || `{{${varName}}}`;
+                    }
+                } else {
+                    val = config.value || `{{${varName}}}`;
+                }
+            }
+
+            const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\\}\\}`, 'g');
+            output = output.replace(regex, val);
+        });
+
+        resultTextEl.textContent = output;
+    };
+
+    const controls = dom.previewContent.querySelectorAll('.preview-form-input');
+    controls.forEach(ctrl => {
+        ctrl.addEventListener('input', updateResultText);
+        ctrl.addEventListener('change', updateResultText);
+    });
+
+    updateResultText();
+}
+
+function renderPreviewContent(content, type, varsConfig) {
+    if (type === 'rich') {
+        try {
+            if (currentRichMode === 'html') {
+                let html = content;
+                html = html.replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (m, varName) => {
+                    return `<span class="preview-var-placeholder">{{${escapeHtml(varName)}}}</span>`;
+                });
+                return html;
+            } else if (typeof marked !== 'undefined' && marked.parse) {
+                let md = content;
+                md = md.replace(/\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g, (m, varName) => {
+                    return `<span class="preview-var-placeholder">{{${escapeHtml(varName)}}}</span>`;
+                });
+                const renderer = new marked.Renderer();
+                renderer.link = function({ href, title, text }) {
+                    const titleAttr = title ? ` title="${title}"` : '';
+                    return `<a href="${href}"${titleAttr} target="_blank" rel="noopener noreferrer">${text}</a>`;
+                };
+                marked.setOptions({ renderer, breaks: true, gfm: true });
+                return marked.parse(md);
+            } else {
+                return `<pre>${escapeHtml(content)}</pre>`;
+            }
+        } catch (e) {
+            return escapeHtml(content);
+        }
+    }
+
+    const parts = content.split(/(\{\{\s*[a-zA-Z0-9_\-]+\s*\}\})/g);
+    const hasVars = /\{\{\s*[a-zA-Z0-9_\-]+\s*\}\}/.test(content);
+
+    if (!hasVars) {
+        return `<div class="preview-inline-container">${escapeHtml(content)}</div>`;
+    }
+
+    let html = '<div class="preview-inline-container">';
+    const varRegex = /^\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}$/;
+
+    parts.forEach(part => {
+        const match = part.match(varRegex);
+        if (match) {
+            const varName = match[1];
+            let config = varsConfig[varName];
+
+            // Force le type 'date' pour chaque variable présente si le match est de type 'date'
+            if (type === 'date') {
+                config = { type: 'date', format: config?.format || '%d/%m/%Y' };
+            } else if (!config) {
+                config = { type: 'static', value: '' };
+            }
+
+            const uid = `preview-${varName}-${Math.random().toString(36).substr(2, 6)}`;
+
+            if (config.type === 'choice' || config.type === 'list') {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<select class="inline-input preview-select" data-var-name="${escapeHtml(varName)}" data-uid="${uid}">`;
+                const values = config.values || [];
+                if (values.length > 0) {
+                    values.forEach(v => {
+                        if (typeof v === 'object' && v !== null) {
+                            html += `<option value="${escapeHtml(v.value || '')}">${escapeHtml(v.text || v.value || '')}</option>`;
+                        } else {
+                            html += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+                        }
+                    });
+                } else {
+                    html += `<option value="">${escapeHtml(varName)}</option>`;
+                }
+                html += `</select>`;
+                html += `</span>`;
+            } else if (config.type === 'date') {
+                const fmt = config.format || dom.dateFormatDefault?.value || '%d/%m/%Y';
+                const formattedDate = formatDateString(fmt);
+                html += `<span class="inline-date-preview" data-var-name="${escapeHtml(varName)}">${escapeHtml(formattedDate)}</span>`;
+            } else if (config.multiline || config.type === 'multiline') {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<textarea class="inline-input preview-multiline" data-var-name="${escapeHtml(varName)}" data-uid="${uid}" rows="1" placeholder="${escapeHtml(varName)}">${escapeHtml(config.value || '')}</textarea>`;
+                html += `</span>`;
+            } else {
+                html += `<span class="inline-field-wrapper" data-var-name="${escapeHtml(varName)}">`;
+                html += `<input type="text" class="inline-input preview-input" data-var-name="${escapeHtml(varName)}" data-uid="${uid}" value="${escapeHtml(config.value || '')}" placeholder="${escapeHtml(varName)}" style="width:${Math.max((varName.length + 5) * 8, 80)}px">`;
+                html += `</span>`;
+            }
+
+            html += `<span class="inline-ref-span hidden-ref" data-uid="${uid}" data-var-name="${escapeHtml(varName)}">${escapeHtml(config.value || '')}</span>`;
+        } else {
+            if (part === '') return;
+            html += `<span class="inline-text">${escapeHtml(part)}</span>`;
+        }
+    });
+
+    html += '</div>';
+    return html;
+}
+
+function wirePreviewControls(content, varsConfig) {
+    const previewContainer = dom.previewContent;
+    const inputs = previewContainer.querySelectorAll('.preview-input, .preview-select, .preview-multiline');
+    inputs.forEach(input => {
+        const uid = input.dataset.uid;
+        if (!uid) return;
+
+        const handler = () => {
+            const refSpans = previewContainer.querySelectorAll(`.hidden-ref[data-uid="${uid}"]`);
+            refSpans.forEach(span => {
+                span.innerText = input.value || input.placeholder || '';
+            });
+        };
+
+        if (input.tagName === 'SELECT') {
+            input.addEventListener('change', handler);
+        } else {
+            input.addEventListener('input', handler);
+        }
+
+        handler();
+    });
+
+    const refs = previewContainer.querySelectorAll('.hidden-ref');
+    refs.forEach(ref => {
+        const uid = ref.dataset.uid;
+        if (!uid) return;
+        const sourceInput = previewContainer.querySelector(`[data-uid="${uid}"]`);
+        if (sourceInput) {
+            ref.innerText = sourceInput.value || sourceInput.placeholder || '';
+        }
+    });
+}
+
+// --- POPULATE EDITOR FROM EXISTING MATCH ---
+
+function populateEditor(match) {
+    dom.triggerInput.value = match.trigger || '';
+
+    let type = 'simple';
+    let content = '';
+    let formVar = null;
+
+    if (match.vars && Array.isArray(match.vars)) {
+        formVar = match.vars.find(v => v.type === 'form');
+    }
+
+    if (match.markdown || match.html) {
+        type = 'rich';
+        content = match.replace || '';
+        currentRichMode = match.html ? 'html' : (match.markdown ? 'markdown' : 'html');
+        dom.mdModeBtns.forEach(b => b.classList.toggle('active', b.dataset.richMode === currentRichMode));
+    } else if (formVar) {
+        type = 'interactive';
+        const formVarName = formVar.name || 'form1';
+        const regex = new RegExp(`\\{\\{\\s*${formVarName}\\.([a-zA-Z0-9_\\-]+)\\s*\\\}\\}`, 'g');
+        content = (match.replace || '').replace(regex, '{{$1}}');
+    } else if (match.form) {
+        type = 'interactive';
+        content = match.form.replace(/\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g, '{{$1}}');
+    } else if (match.vars && Array.isArray(match.vars)) {
+        const allVarsAreDate = match.vars.length > 0 && match.vars.every(v => v.type === 'date');
+        if (allVarsAreDate) {
+            type = 'date';
+            content = match.replace || '';
+        } else {
+            type = 'simple';
+            content = match.replace || '';
+        }
+    } else {
+        type = 'simple';
+        content = match.replace || '';
+    }
+
+    setMatchType(type);
+    dom.contentInput.value = content;
+
+    if (type === 'interactive' || type === 'date') {
+        clearVarsConfig();
+        setTimeout(() => {
+            syncVarsFromText();
+            const rows = dom.varsConfigList.querySelectorAll('.var-config-row');
+            
+            let fieldsSource = null;
+            if (formVar && formVar.params && formVar.params.fields) {
+                fieldsSource = formVar.params.fields;
+            } else if (match.form_fields) {
+                fieldsSource = match.form_fields;
+            }
+
+            if (type === 'date' && match.vars) {
+                match.vars.forEach(v => {
+                    rows.forEach(row => {
+                        if (row.dataset.varName === v.name) {
+                            const dateFormatInput = row.querySelector('.var-date-format');
+                            if (dateFormatInput && v.params && v.params.format) {
+                                dateFormatInput.value = v.params.format;
+                            }
+                        }
+                    });
+                });
+            } else if (fieldsSource) {
+                Object.keys(fieldsSource).forEach(varName => {
+                    const fieldConfig = fieldsSource[varName];
+                    rows.forEach(row => {
+                        if (row.dataset.varName === varName) {
+                            const typeSelect = row.querySelector('.var-type-select');
+                            const defaultInput = row.querySelector('.var-default-value');
+                            const multilineInput = row.querySelector('.var-default-value-multiline');
+                            const dateFormatInput = row.querySelector('.var-date-format');
+                            const optionsList = row.querySelector('.var-options-list');
+                            
+                            const fType = fieldConfig.type;
+                            const fParams = fieldConfig.params || {};
+
+                            if (fType === 'choice' || fType === 'list') {
+                                typeSelect.value = 'choice';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (optionsList) {
+                                    optionsList.innerHTML = '';
+                                    const values = fieldConfig.values || fParams.values || fParams.choices;
+                                    if (values) {
+                                        values.forEach(val => {
+                                            if (typeof val === 'object' && val !== null) {
+                                                addVarOptionRow(optionsList, val.label || val.text || '', val.id || val.value || '');
+                                            } else {
+                                                addVarOptionRow(optionsList, val, val);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (fieldConfig.multiline === true || (fType === 'echo' && (fParams.echo || '').includes('\n'))) {
+                                typeSelect.value = 'multiline';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (multilineInput) {
+                                    multilineInput.value = fieldConfig.placeholder || fParams.echo || '';
+                                }
+                            } else if (fType === 'date' || fieldConfig.type === 'date') {
+                                typeSelect.value = 'date';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (dateFormatInput) {
+                                    dateFormatInput.value = fParams.format || fieldConfig.placeholder || '%d/%m/%Y';
+                                }
+                            } else {
+                                typeSelect.value = 'static';
+                                typeSelect.dispatchEvent(new Event('change'));
+                                if (defaultInput) {
+                                    defaultInput.value = fieldConfig.placeholder || fParams.echo || fParams.value || '';
+                                }
+                            }
+                            typeSelect.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+            }
+            updatePreview();
+        }, 50);
+    }
+
+    updateEditorUI();
+    updatePreview();
+}
+// --- SAVE MATCH FROM EDITOR ---
 
 function saveMatchFromEditor() {
     const type = getMatchType();
-    const trigger = dom.triggerInput.value;
-    let content = dom.contentInput.value;
+    const trigger = dom.triggerInput.value.trim();
+    const content = dom.contentInput.value || '';
 
     if (!trigger) {
         alert(t('alertTriggerRequired'));
         return;
     }
 
-    const newMatch = {
-        trigger: trigger
-    };
+    const newMatch = { trigger: trigger };
 
-    if (type === 'simple') {
+    if (type === 'rich') {
         newMatch.replace = content;
-    } else if (type === 'form') {
-
-        // 1. Get explicitly configured fields from UI
-        const configuredFields = getFormFieldsFromUI() || {};
-
-        // 2. Synchronization: Ensure all configured fields exist in the content
-        // "Toute clé définie sous form_fields doit obligatoirement apparaître dans le texte"
-        Object.keys(configuredFields).forEach(fieldName => {
-            // Regex to find [[fieldName]] with optional whitespace
-            const pattern = new RegExp(`\\[\\[\\s*${fieldName}\\s*\\]\\]`);
-            if (!pattern.test(content)) {
-                // If missing, append it logically
-                if (content.length > 0 && !content.endsWith('\n')) {
-                    content += '\n';
-                }
-                content += `${fieldName}: [[${fieldName}]]`;
-            }
-        });
-
-        // Update the main content variable (and thus the match)
-        newMatch.form = content;
-
-        // 3. Extract variables from content [[varname]] to capture anything NOT in UI
-        const regex = /\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g;
-        let match;
-        const detectedVars = new Set();
-        while ((match = regex.exec(content)) !== null) {
-            detectedVars.add(match[1]);
+        if (currentRichMode === 'html') {
+            newMatch.html = true;
+        } else {
+            newMatch.markdown = true;
         }
-
-        // 4. Merge: Default to type: 'text' for any detected var not in UI
-        const finalFormFields = {};
-        const finalVars = [];
-
-        // Add all configured fields first
-        Object.keys(configuredFields).forEach(varName => {
-            const field = configuredFields[varName];
-            if (field.type === 'date') {
-                finalVars.push({
-                    name: varName,
-                    type: 'date',
-                    params: { format: field.format }
-                });
-            } else {
-                finalFormFields[varName] = field;
-            }
-        });
-
-        // Add missing detected variables as simple text
-        detectedVars.forEach(varName => {
-            if (!finalFormFields[varName] && !finalVars.find(v => v.name === varName)) {
-                finalFormFields[varName] = { type: 'text' };
-            }
-        });
-
-        // Only add form_fields if we actually have fields
-        if (Object.keys(finalFormFields).length > 0) {
-            newMatch.form_fields = finalFormFields;
-        }
-
-        if (finalVars.length > 0) {
-            newMatch.vars = finalVars;
-        }
-
-        if (Object.keys(finalFormFields).length === 0 && finalVars.length === 0) {
-            // No variables detected - this is likely an error
-            alert(t('alertFormRequired'));
-            return;
-        }
-
+    } else if (type === 'simple') {
+        newMatch.replace = content;
     } else if (type === 'date') {
+        const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+        const detectedVars = [];
+        let match;
+        while ((match = varRegex.exec(content)) !== null) {
+            if (!detectedVars.includes(match[1])) detectedVars.push(match[1]);
+        }
+
         newMatch.replace = content;
-        newMatch.vars = [{
-            name: "mydate",
-            type: "date",
-            params: { format: dom.dateFormat.value }
-        }];
+        
+        const varsConfig = getVarsConfig();
+        const varsArray = [];
+
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { format: '%d/%m/%Y' };
+            const formatVal = config.format || '%d/%m/%Y';
+            varsArray.push({
+                name: varName,
+                type: 'date',
+                params: {
+                    format: formatVal
+                }
+            });
+        });
+
+        if (varsArray.length > 0) {
+            newMatch.vars = varsArray;
+        }
+    } else if (type === 'interactive') {
+        const varRegex = /\{\{\s*([a-zA-Z0-9_\-]+)\s*\}\}/g;
+        const detectedVars = [];
+        let match;
+        while ((match = varRegex.exec(content)) !== null) {
+            if (!detectedVars.includes(match[1])) detectedVars.push(match[1]);
+        }
+
+        const varsConfig = getVarsConfig();
+        
+        let replaceText = content;
+        detectedVars.forEach(varName => {
+            const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\\}\\}`, 'g');
+            replaceText = replaceText.replace(regex, `{{form1.${varName}}}`);
+        });
+        
+        newMatch.replace = replaceText;
+        
+        const formLayout = detectedVars.map(v => `[[${v}]]`).join('\n');
+        const formFields = {};
+        
+        detectedVars.forEach(varName => {
+            const config = varsConfig[varName] || { type: 'static', value: '' };
+            const fieldDef = {};
+
+            if (config.type === 'choice' || config.type === 'list') {
+                const valuesList = (config.values || []).map(v => {
+                    if (typeof v === 'object' && v !== null) {
+                        return v.value || v.text || v.id || String(v);
+                    }
+                    return String(v);
+                });
+                fieldDef.type = 'choice';
+                fieldDef.values = valuesList;
+            } else if (config.type === 'multiline') {
+                fieldDef.multiline = true;
+                if (config.value) fieldDef.placeholder = config.value;
+            } else if (config.type === 'date') {
+                fieldDef.type = 'date';
+                if (config.format) fieldDef.placeholder = config.format;
+            } else {
+                if (config.value) fieldDef.placeholder = config.value;
+            }
+
+            formFields[varName] = fieldDef;
+        });
+        
+        newMatch.vars = [
+            {
+                name: 'form1',
+                type: 'form',
+                params: {
+                    layout: formLayout,
+                    fields: formFields
+                }
+            }
+        ];
     }
 
     if (editingIndex === -1) {
@@ -1261,6 +2399,7 @@ function saveMatchFromEditor() {
 
     const targetIndex = (editingIndex === -1) ? currentMatches.length - 1 : editingIndex;
     closeEditor();
+    markActiveFileAsModified();
     renderMatches(targetIndex);
     updateYamlPreview();
 }
@@ -1269,6 +2408,7 @@ function deleteMatchFromEditor() {
     if (editingIndex !== -1) {
         if (confirm(t('confirmDelete'))) {
             currentMatches.splice(editingIndex, 1);
+            markActiveFileAsModified();
             renderMatches();
             updateYamlPreview();
             closeEditor();
@@ -1279,9 +2419,7 @@ function deleteMatchFromEditor() {
 // --- Live Preview Logic ---
 
 function updateYamlPreview() {
-    // Avoid recursion if we are currently editing the text area
     if (document.activeElement === dom.yamlEditor) return;
-
     const yaml = generateYaml();
     dom.yamlEditor.value = yaml;
 }
@@ -1289,229 +2427,174 @@ function updateYamlPreview() {
 function handleYamlEditorInput() {
     const text = dom.yamlEditor.value;
     try {
-        const data = jsyaml.load(text);
+        const data = jsyaml.load(text, { schema: jsyaml.CORE_SCHEMA });
         if (data && data.matches) {
             currentMatches = data.matches;
-            renderMatches(); // Update visual list only
-            // Do NOT call updateYamlPreview here to avoid cursor jumping
+            markActiveFileAsModified();
+            renderMatches();
         }
-    } catch (e) {
-        // Allow invalid YAML while typing, just don't update visual view
-        // console.warn("Invalid YAML during edit", e);
-    }
+    } catch (e) { /* allow invalid YAML while typing */ }
 }
 
 function formatYamlPreview() {
-    const yaml = generateYaml();
-    dom.yamlEditor.value = yaml;
+    dom.yamlEditor.value = generateYaml();
 }
 
 function copyYamlContent() {
     navigator.clipboard.writeText(dom.yamlEditor.value).then(() => {
         const btn = dom.btnCopyYaml;
-
-        // Simple visual feedback
         const originalContent = btn.innerHTML;
         btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${t('copied')}`;
-
-        setTimeout(() => {
-            btn.innerHTML = originalContent;
-        }, 2000);
+        setTimeout(() => { btn.innerHTML = originalContent; }, 2000);
     });
 }
 
-// --- Form Preview Logic ---
+// --- Format toolbar ---
 
-function updateFormPreview() {
-    // Only show preview for form type
-    if (getMatchType() !== 'form') {
-        dom.formPreview.classList.add('hidden');
-        return;
+const formatSyntax = {
+    html_b: { before: '<b>', after: '</b>', placeholder: 'gras' },
+    html_i: { before: '<i>', after: '</i>', placeholder: 'italique' },
+    html_s: { before: '<s>', after: '</s>', placeholder: 'barré' },
+    html_u: { before: '<u>', after: '</u>', placeholder: 'souligné' },
+    html_link: { before: '<a href="', after: '">', placeholder: 'url', then: 'texte</a>' },
+    html_code: { before: '<code>', after: '</code>', placeholder: 'code' },
+    html_ul: { before: '<ul>\n  <li>', after: '</li>\n</ul>', placeholder: 'élément', block: true },
+    html_ol: { before: '<ol>\n  <li>', after: '</li>\n</ol>', placeholder: 'élément', block: true },
+    md_bold: { before: '**', after: '**', placeholder: 'texte en gras' },
+    md_italic: { before: '*', after: '*', placeholder: 'texte en italique' },
+    md_strikethrough: { before: '~~', after: '~~', placeholder: 'texte barré' },
+    md_code: { before: '`', after: '`', placeholder: 'code' },
+    md_link: { before: '[', after: '](url)', placeholder: 'texte du lien' },
+    md_ul: { before: '- ', after: '', placeholder: 'élément de liste', block: true },
+    md_ol: { before: '1. ', after: '', placeholder: 'élément numéroté', block: true }
+};
+
+function handleFormatToolbar(action) {
+    let syntax;
+    if (getMatchType() === 'rich' && currentRichMode === 'markdown') {
+        const mdMap = { html_b: 'md_bold', html_i: 'md_italic', html_s: 'md_strikethrough', html_code: 'md_code', html_link: 'md_link', html_ul: 'md_ul', html_ol: 'md_ol' };
+        const mdAction = mdMap[action] || action;
+        syntax = formatSyntax[mdAction];
+    } else {
+        syntax = formatSyntax[action];
     }
 
-    const formText = dom.contentInput.value;
-    if (!formText) {
-        dom.formPreview.classList.add('hidden');
-        return;
+    if (!syntax) return;
+
+    const textarea = dom.contentInput;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+
+    let before = syntax.before;
+    let after = syntax.after;
+    let placeholder = syntax.placeholder;
+    const isBlock = syntax.block || false;
+
+    if (isBlock && !selected) {
+        const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = text.indexOf('\n', start);
+        const line = text.substring(lineStart, lineEnd !== -1 ? lineEnd : text.length);
+        const newText = text.substring(0, lineStart) + before + line + after + text.substring(lineStart + line.length);
+        textarea.value = newText;
+        const newPos = lineStart + before.length + line.length + after.length;
+        textarea.selectionStart = newPos;
+        textarea.selectionEnd = newPos;
+    } else if (isBlock && selected) {
+        const lines = selected.split('\n');
+        const wrappedLines = lines.map((l, i) => (i === 0 && action === 'ol' ? before : before) + l);
+        const newText = text.substring(0, start) + wrappedLines.join('\n') + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start;
+        textarea.selectionEnd = start + wrappedLines.join('\n').length;
+    } else if (!selected && placeholder) {
+        const insertion = before + placeholder + after;
+        const newText = text.substring(0, start) + insertion + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + placeholder.length;
+    } else if (selected) {
+        const insertion = before + selected + after;
+        const newText = text.substring(0, start) + insertion + text.substring(end);
+        textarea.value = newText;
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length + selected.length;
     }
 
-    // Show preview
-    dom.formPreview.classList.remove('hidden');
-
-    // Get all configured fields
-    const fields = getFormFieldsFromUI();
-    let previewText = formText;
-
-    // Replace each [[variable]] with example values
-    Object.keys(fields).forEach(fieldName => {
-        const fieldData = fields[fieldName];
-        const pattern = new RegExp(`\\[\\[\\s*${fieldName}\\s*\\]\\]`, 'g');
-
-        let exampleValue = '';
-        if (fieldData.type === 'choice' || fieldData.type === 'list') {
-            // Show first value as example
-            if (fieldData.values && fieldData.values.length > 0) {
-                exampleValue = `[${fieldData.values[0]}]`;
-            } else {
-                exampleValue = t('choicePreview');
-            }
-        } else if (fieldData.multiline) {
-            exampleValue = t('textMultilinePreview');
-        } else {
-            exampleValue = `[${fieldName}]`;
-        }
-
-        previewText = previewText.replace(pattern, exampleValue);
-    });
-
-    // Also handle any variables not in configured fields
-    previewText = previewText.replace(/\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]/g, '[$1]');
-
-    dom.formPreviewContent.innerHTML = '';
-
-    // Regex to split by [[variable]]
-    // Capturing parenthesis () keep the delimiter in the result array
-    const parts = formText.split(/(\[\[\s*[a-zA-Z0-9_\-]+\s*\]\])/g);
-
-    const checkContainer = document.createElement('div');
-    checkContainer.className = 'preview-inline-container';
-
-    parts.forEach(part => {
-        const varMatch = part.match(/^\[\[\s*([a-zA-Z0-9_\-]+)\s*\]\]$/);
-
-        if (varMatch) {
-            // It's a variable [[name]]
-            const varName = varMatch[1];
-            const fieldData = fields[varName] || { type: 'text' };
-
-            const wrapper = document.createElement('span');
-            wrapper.className = 'inline-field-wrapper';
-
-            // Add a small label above or placeholder
-            // For inline style, placeholder inside is cleaner, or simple tooltip
-
-            let input;
-
-            if (fieldData.type === 'choice' || fieldData.type === 'list') {
-                input = document.createElement('select');
-                input.className = 'inline-input';
-                if (fieldData.values && fieldData.values.length > 0) {
-                    fieldData.values.forEach(val => {
-                        const opt = document.createElement('option');
-                        opt.value = val;
-                        opt.innerText = val;
-                        input.appendChild(opt);
-                    });
-                } else {
-                    const opt = document.createElement('option');
-                    opt.innerText = t('choicePreview');
-                    input.appendChild(opt);
-                }
-            } else if (fieldData.type === 'date') {
-                input = document.createElement('span');
-                input.className = 'inline-date-preview';
-                input.innerText = formatDateString(fieldData.format || '%d/%m/%Y');
-            } else if (fieldData.multiline || fieldData.type === 'text_multiline') {
-                input = document.createElement('textarea');
-                input.className = 'inline-input';
-                input.rows = 1; // Start small, expand if needed
-                input.placeholder = varName;
-            } else {
-                // Default text
-                input = document.createElement('input');
-                input.className = 'inline-input';
-                input.type = 'text';
-                input.placeholder = varName;
-                // Auto-size width based on placeholder
-                input.style.width = `${Math.max(varName.length * 10, 80)}px`;
-            }
-
-            wrapper.appendChild(input);
-            checkContainer.appendChild(wrapper);
-
-        } else {
-            // It's just text
-            if (part === '') return;
-
-            const span = document.createElement('span');
-            span.className = 'inline-text';
-            // Preserve newlines
-            span.innerText = part;
-            checkContainer.appendChild(span);
-        }
-    });
-
-    dom.formPreviewContent.appendChild(checkContainer);
+    textarea.focus();
+    updatePreview();
 }
 
-function updateDatePreview() {
-    if (getMatchType() !== 'date') return;
-
-    const format = dom.dateFormat.value;
-    const content = dom.contentInput.value;
-
-    if (!content) {
-        dom.datePreview.innerHTML = '';
-        return;
-    }
-
-    const formattedDate = formatDateString(format || '%d/%m/%Y');
-
-    // Match the style of form preview
-    dom.datePreview.innerHTML = '';
-    const container = document.createElement('div');
-    container.className = 'preview-inline-container';
-
-    // Split by {{mydate}}
-    const parts = content.split(/(\{\{\s*mydate\s*\}\})/g);
-
-    parts.forEach(part => {
-        if (/^\{\{\s*mydate\s*\}\}$/.test(part)) {
-            const span = document.createElement('span');
-            span.className = 'inline-date-preview';
-            span.innerText = formattedDate;
-            container.appendChild(span);
-        } else {
-            if (part === '') return;
-            const span = document.createElement('span');
-            span.className = 'inline-text';
-            span.innerText = part;
-            container.appendChild(span);
-        }
-    });
-
-    dom.datePreview.appendChild(container);
-}
+// --- Date Format Helper ---
 
 function formatDateString(format) {
     const now = new Date();
-
     const pad = n => n.toString().padStart(2, '0');
-
     const day = pad(now.getDate());
     const month = pad(now.getMonth() + 1);
     const year = now.getFullYear();
     const hour = pad(now.getHours());
     const minute = pad(now.getMinutes());
     const second = pad(now.getSeconds());
-
-    // Localized
     const locale = currentLang === 'fr' ? 'fr-FR' : 'en-US';
     const dayName = now.toLocaleDateString(locale, { weekday: 'long' });
     const monthName = now.toLocaleDateString(locale, { month: 'long' });
-
-    // Capitalize first letter
     const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+    return format.replace(/%d/g, day).replace(/%m/g, month).replace(/%Y/g, year).replace(/%H/g, hour).replace(/%M/g, minute).replace(/%S/g, second).replace(/%A/g, cap(dayName)).replace(/%B/g, cap(monthName));
+}
 
-    return format
-        .replace(/%d/g, day)
-        .replace(/%m/g, month)
-        .replace(/%Y/g, year)
-        .replace(/%H/g, hour)
-        .replace(/%M/g, minute)
-        .replace(/%S/g, second)
-        .replace(/%A/g, cap(dayName))
-        .replace(/%B/g, cap(monthName));
+// --- Create New File/Folder ---
+
+async function createNewFile() {
+    if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
+    const fileName = prompt(t('promptFileName'), 'nouveau.yml');
+    if (!fileName) return;
+    let finalName = fileName;
+    if (!finalName.endsWith('.yml') && !finalName.endsWith('.yaml')) finalName += '.yml';
+    try {
+        if (window.showDirectoryPicker && currentDirHandle) {
+            let fileHandle;
+            try {
+                fileHandle = await currentDirHandle.getFileHandle(finalName);
+                if (!confirm(t('confirmOverwriteFile'))) return;
+                const writable = await fileHandle.createWritable();
+                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+                await writable.write(defaultContent); await writable.close();
+            } catch (e) {
+                fileHandle = await currentDirHandle.getFileHandle(finalName, { create: true });
+                const writable = await fileHandle.createWritable();
+                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+                await writable.write(defaultContent); await writable.close();
+            }
+        } else {
+            const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
+            const blob = new Blob([defaultContent], { type: 'text/yaml;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a'); link.href = url; link.download = finalName;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+        }
+        dom.statusMessage.innerText = t('newFileCreated') + finalName;
+        if (window.showDirectoryPicker && currentDirHandle) await readDirectory(currentDirHandle);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating file:', err); alert(t('errorCreatingFile')); } }
+}
+
+async function createNewFolder() {
+    if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
+    if (!window.showDirectoryPicker) { alert(t('errorCreatingFolder') + ' ' + t('alertNoApi')); return; }
+    const folderName = prompt(t('promptFolderName'), 'nouveau-dossier');
+    if (!folderName) return;
+    if (!/^[a-zA-Z0-9_\- ]+$/.test(folderName)) { alert(t('errorCreatingFolder')); return; }
+    try {
+        await currentDirHandle.getDirectoryHandle(folderName, { create: true });
+        
+        if (!folderDirs.includes(folderName)) {
+            folderDirs.push(folderName);
+        }
+        
+        dom.statusMessage.innerText = t('newFolderCreated') + folderName;
+        await readDirectory(currentDirHandle);
+    } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating folder:', err); alert(t('errorCreatingFolder')); } }
 }
 
 // Start
