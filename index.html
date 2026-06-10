@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">
     <title data-i18n="appTitle">Espanso YAML Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -37,6 +40,13 @@
                     <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
                 <span data-i18n="btnOpen">Ouvrir</span>
+            </button>
+            <button id="btnOpenFolder" class="btn secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span data-i18n="btnOpenFolder">Ouvrir un dossier</span>
             </button>
             <div class="dropdown-container">
                 <div class="split-button">
@@ -88,17 +98,29 @@
                 <div class="sidebar-pane">
                     <div class="toolbar sidebar-toolbar">
                         <h3 data-i18n="sidebarTitle">Explorateur</h3>
-                        <button id="btnSortAlpha" class="btn-icon" data-i18n-title="btnSortAlpha"
-                            title="Trier par ordre alphabétique">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 5h10"></path>
-                                <path d="M11 9h7"></path>
-                                <path d="M11 13h4"></path>
-                                <path d="M3 17l3 3 3-3"></path>
-                                <path d="M6 18V4"></path>
-                            </svg>
-                        </button>
+                        <div class="sidebar-actions">
+                            <button id="btnNewFile" class="btn-icon" data-i18n-title="btnNewFile"
+                                title="Nouveau fichier YML">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="12" y1="12" x2="12" y2="18"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                            </button>
+                            <button id="btnNewFolder" class="btn-icon" data-i18n-title="btnNewFolder"
+                                title="Nouveau dossier">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                    </path>
+                                    <line x1="12" y1="11" x2="12" y2="17"></line>
+                                    <line x1="9" y1="14" x2="15" y2="14"></line>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div id="sidebarList" class="sidebar-list">
                         <!-- Triggers will be listed here -->
@@ -123,8 +145,8 @@
                     <div id="matchesList" class="matches-grid">
                         <!-- Les cards seront générées ici par JS -->
                         <div class="empty-state">
-                            <p data-i18n="welcomeMessage">Commencez par ouvrir un fichier <code>.yml</code> ou créez un
-                                nouveau match.</p>
+                            <p data-i18n="welcomeMessage">Commencez par ouvrir un fichier .yml ou créez un nouveau
+                                match.</p>
                         </div>
                     </div>
                 </div>
@@ -162,7 +184,7 @@
         </div>
     </main>
 
-    <!-- Modal d'édition -->
+    <!-- Modal d'édition UNIFIÉ -->
     <div id="editorModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -170,12 +192,11 @@
                 <button class="close-btn" id="btnCloseModal">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Overlay de sélection de type -->
+                <!-- Overlay de sélection de type (pour NOUVEAU match seulement) -->
                 <div id="typeOverlay" class="type-overlay">
                     <div class="type-selection-content">
                         <h3 data-i18n="selectTypeTitle">Quel type de raccourci ?</h3>
-                        <p data-i18n="selectTypeDesc">Choisissez le format de base. Ce choix ne pourra pas être modifié
-                            pour ce raccourci.</p>
+                        <p data-i18n="selectTypeDesc">Choisissez le format de base.</p>
                         <div class="type-buttons-large">
                             <button class="type-btn-large" data-type="simple">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -188,7 +209,18 @@
                                 </svg>
                                 <span data-i18n="typeSimple">Texte Simple</span>
                             </button>
-                            <button class="type-btn-large" data-type="form">
+                            <button class="type-btn-large" data-type="rich">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 7V4h16v3"></path>
+                                    <path d="M9 20h6"></path>
+                                    <path d="M12 4v16"></path>
+                                    <path d="M6 10l-2 2 2 2"></path>
+                                    <path d="M18 14l2-2-2-2"></path>
+                                </svg>
+                                <span data-i18n="typeRich">Texte riche</span>
+                            </button>
+                            <button class="type-btn-large" data-type="interactive">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="4" width="18" height="12" rx="2"></rect>
@@ -198,7 +230,7 @@
                                     <path d="M7 8h10"></path>
                                     <path d="M7 12h4"></path>
                                 </svg>
-                                <span data-i18n="typeForm">Formulaire</span>
+                                <span data-i18n="typeInteractive">Formulaire</span>
                             </button>
                             <button class="type-btn-large" data-type="date">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -214,27 +246,7 @@
                     </div>
                 </div>
 
-                <div class="form-group hidden">
-                    <label for="matchType">
-                        <span data-i18n="contentType">Type de contenu</span>
-                        <i class="tooltip-icon" data-i18n-tooltip="tooltipContentType">?</i>
-                    </label>
-                    <div class="type-selector">
-                        <label class="type-option">
-                            <input type="radio" name="matchType" value="simple" checked>
-                            <span data-i18n="typeSimple">Texte Simple</span>
-                        </label>
-                        <label class="type-option">
-                            <input type="radio" name="matchType" value="form">
-                            <span data-i18n="typeForm">Formulaire</span>
-                        </label>
-                        <label class="type-option">
-                            <input type="radio" name="matchType" value="date">
-                            <span data-i18n="typeDate">Date</span>
-                        </label>
-                    </div>
-                </div>
-
+                <!-- Trigger -->
                 <div class="form-group">
                     <label for="triggerInput">
                         <span data-i18n="triggerLabel">Déclencheur (Trigger)</span>
@@ -245,90 +257,193 @@
                     <small data-i18n="triggerHelp">Le texte à taper pour déclencher le remplacement (ex: :date)</small>
                 </div>
 
-                <!-- Section Texte / Forme -->
-                <div id="contentSection" class="form-group">
-                    <label id="contentLabel" for="contentInput">
-                        <span data-i18n="contentLabelReplacement">Texte de remplacement</span>
-                        <i class="tooltip-icon" data-i18n-tooltip="tooltipContent">?</i>
-                    </label>
-                    <textarea id="contentInput" rows="6" data-i18n-placeholder="contentPlaceholder"
-                        placeholder="Votre texte ici..."></textarea>
-                    <small id="contentHelp" data-i18n="contentHelp">Vous pouvez utiliser plusieurs lignes.</small>
-                </div>
-
-                <!-- Visual Form Fields Builder -->
-                <div id="formFieldsSection" class="form-group hidden">
-                    <label>
-                        <span data-i18n="specialFieldsTitle">Champs Spéciaux (Listes, Choix)</span>
-                        <i class="tooltip-icon" data-i18n-tooltip="tooltipSpecialFields">?</i>
-                    </label>
-                    <div class="info-box">
-                        <small data-i18n="specialFieldsHelp">Définissez ici les variables qui nécessitent un menu
-                            déroulant ou une liste.</small>
-                    </div>
-                    <div id="fieldsList" class="fields-list">
-                        <!-- Dynamic Fields Here -->
-                    </div>
-                    <button id="btnAddField" class="btn secondary small"><span data-i18n="btnAddField">+ Ajouter un
-                            champ spécial</span></button>
-
-                    <!-- Live Form Preview -->
-                    <div id="formPreview" class="form-preview hidden">
-                        <label data-i18n="formPreviewLabel">Aperçu du formulaire</label>
-                        <div id="formPreviewContent" class="preview-ui"></div>
-                    </div>
-
-                    <!-- Templates for JS -->
-                    <template id="fieldRowTemplate">
-                        <div class="field-row">
-                            <div class="field-header">
-                                <input type="text" class="field-name" data-i18n-placeholder="fieldNamePlaceholder"
-                                    placeholder="Nom variable (ex: choices)">
-                                <button class="btn-icon remove-field" data-i18n-title="removeField"
-                                    title="Supprimer">&times;</button>
-                            </div>
-                            <div class="field-body">
-                                <div class="col">
-                                    <label data-i18n="fieldType">Type</label>
-                                    <select class="field-type">
-                                        <option value="text" data-i18n="fieldText">Texte (Input)</option>
-                                        <option value="date" data-i18n="typeDate">Date</option>
-                                        <option value="choice" data-i18n="fieldChoice">Choix (Dropdown)</option>
-                                        <option value="list" data-i18n="fieldList">Liste (Selection)</option>
-                                        <option value="text_multiline" data-i18n="fieldMultiline">Texte Multiligne
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <label data-i18n="fieldValues">Valeurs (une par ligne)</label>
-                                    <textarea class="field-values" rows="3"
-                                        data-i18n-placeholder="fieldValuesPlaceholder"
-                                        placeholder="Option 1&#10;Option 2"></textarea>
+                <!-- UNIFIED EDITOR -->
+                <div id="unifiedEditor" class="unified-editor">
+                    <!-- Toolbar unifiée -->
+                    <div class="unified-toolbar">
+                        <!-- Formatting buttons (for simple, rich modes) -->
+                        <div class="unified-format-group">
+                            <button class="md-toolbar-btn" data-md="html_b" title="Gras"><strong>B</strong></button>
+                            <button class="md-toolbar-btn" data-md="html_i" title="Italique"><em>I</em></button>
+                            <button class="md-toolbar-btn" data-md="html_s" title="Barré"><s>S</s></button>
+                            <button class="md-toolbar-btn" data-md="html_u" title="Souligné"><u>U</u></button>
+                            <div class="md-toolbar-sep"></div>
+                            <button class="md-toolbar-btn" data-md="html_link" title="Lien">🔗</button>
+                            <button class="md-toolbar-btn" data-md="html_code" title="Code"></></button>
+                            <div class="md-toolbar-sep"></div>
+                            <button class="md-toolbar-btn" data-md="html_ul" title="Liste">•</button>
+                            <button class="md-toolbar-btn" data-md="html_ol" title="Liste numérotée">1.</button>
+                        </div>
+                        <div class="unified-toolbar-sep"></div>
+                        <!-- Mode Toggle (rich only) -->
+                        <div id="unifiedModeToggle" class="unified-mode-toggle">
+                            <button class="md-mode-btn active" data-rich-mode="html"
+                                data-i18n="richModeHtml">HTML</button>
+                            <button class="md-mode-btn" data-rich-mode="markdown"
+                                data-i18n="richModeMarkdown">Markdown</button>
+                            <div class="md-toolbar-sep"></div>
+                        </div>
+                        <div class="unified-toolbar-sep"></div>
+                        <!-- Insert Menu -->
+                        <div class="unified-insert-group">
+                            <div class="insert-dropdown">
+                                <button class="btn secondary small insert-toggle" id="btnInsertToggle">
+                                    <span data-i18n="insertLabel">Insérer</span>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="insert-menu hidden" id="insertMenu">
+                                    <button class="insert-menu-item" data-insert-type="text">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        <span data-i18n="insertText">Champ texte</span>
+                                    </button>
+                                    <button class="insert-menu-item" data-insert-type="choice">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg>
+                                        <span data-i18n="insertChoice">Choix (dropdown)</span>
+                                    </button>
+                                    <button class="insert-menu-item" data-insert-type="list">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                        </svg>
+                                        <span data-i18n="insertList">Liste (selection)</span>
+                                    </button>
+                                    <button class="insert-menu-item" data-insert-type="multiline">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                            <path d="M6 6h.01M6 18h.01"></path>
+                                        </svg>
+                                        <span data-i18n="insertMultiline">Texte multilignes</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </template>
+                    </div>
+
+                    <!-- Zone d'édition -->
+                    <textarea id="contentInput" rows="8" data-i18n-placeholder="contentPlaceholder"
+                        placeholder="Votre texte ici..."></textarea>
+
+                    <!-- CONFIGURATION DES VARIABLES (Placé directement au-dessus de l'aperçu) -->
+                    <div id="varsConfigPanel" class="vars-config hidden">
+                        <div class="vars-config-header">
+                            <span data-i18n="varsConfigTitle">Variables détectées</span>
+                            <span class="vars-config-hint" data-i18n="varsConfigHint">Utilisez <code>{{nom}}</code> dans
+                                le texte pour créer une variable</span>
+                        </div>
+                        <div id="varsConfigList" class="vars-config-list">
+                            <!-- Les cartes de configuration seront générées ici par JS -->
+                        </div>
+                    </div>
+
+                 <!-- Date format config (visible when {{var}} of type "date" detected, or type === "date") -->
+<div id="dateFormatConfig" class="vars-config hidden">
+    <div class="vars-config-header">
+        <span data-i18n="dateConfigTitle">Format de date par défaut</span>
+    </div>
+    <div class="var-date-config-row">
+        <input type="text" id="dateFormatDefault" value="%d/%m/%Y">
+        <small class="var-helper" data-i18n="dateParameters">Paramètres : %d (jour), %m (mois), %Y (année), %H:%M (heure).</small>
+        <a href="https://docs.rs/chrono/latest/chrono/format/strftime/index.html" target="_blank" rel="noopener noreferrer" class="var-helper-link" data-i18n="dateGuideLink" style="font-size: 0.75rem; color: var(--primary-color); display: block; margin-top: 0.25rem;">Guide complet des formats (Chrono)</a>
+    </div>
+</div>
+
+                    <!-- APERÇU (toujours au bas du bloc) -->
+                    <div id="previewSection" class="preview-section">
+                        <div class="preview-header">
+                            <span class="preview-label" data-i18n="previewLabel">Aperçu</span>
+                            <span id="previewTypeLabel" class="preview-type-label"></span>
+                        </div>
+                        <div id="previewContent" class="preview-content"></div>
+                    </div>
                 </div>
 
-                <!-- Section Specifique Date -->
-                <div id="dateSection" class="form-group hidden">
-                    <div class="info-box success" style="margin-bottom: 0.5rem;">
-                        <small data-i18n="dateModeNote">Ce mode est optimisé pour les raccourcis de date simples. Pour
-                            un formulaire mixant texte et date, préférez le mode "Formulaire".</small>
-                    </div>
-                    <label for="dateFormat">
-                        <span data-i18n="dateFormatLabel">Format de la date</span>
-                        <i class="tooltip-icon" data-i18n-tooltip="tooltipDateFormat">?</i>
-                    </label>
-                    <input type="text" id="dateFormat" value="%d/%m/%Y">
-                    <small id="dateHelp" data-i18n="dateParameters">Paramètres : %d (jour), %m (mois), %Y (année), %H:%M
-                        (heure).</small>
+                <!-- Template pour générer les blocs d'édition de variables inline -->
+                <template id="varConfigRowTemplate">
+    <div class="var-config-row" data-var-name="">
+        <div class="var-config-header-row">
+            <span class="var-config-name"></span>
+            <div class="var-config-type">
+                <select class="var-type-select">
+                    <option value="static" data-i18n="varTypeStatic">Texte (static)</option>
+                    <option value="choice" data-i18n="varTypeChoice">Choix (dropdown)</option>
+                    <option value="list" data-i18n="varTypeList">Liste (selection)</option>
+                    <option value="multiline" data-i18n="varTypeMultiline">Texte multilignes</option>
+                    <option value="date" data-i18n="varTypeDate">Date</option>
+                </select>
+            </div>
+        </div>
+        <div class="var-config-body">
+            <!-- Static value input -->
+            <div class="var-config-field var-static-field">
+                <label class="var-field-label" data-i18n="varDefaultValue">Valeur par défaut</label>
+                <input type="text" class="var-default-value" placeholder="Valeur">
+            </div>
 
-                    <div class="form-preview">
-                        <label data-i18n="datePreviewLabel">Aperçu du résultat</label>
-                        <div id="datePreview" class="preview-ui"></div>
+            <!-- Multiline value textarea -->
+            <div class="var-config-field var-multiline-field hidden">
+                <label class="var-field-label" data-i18n="varDefaultValue">Valeur par défaut</label>
+                <textarea class="var-default-value-multiline" rows="2" placeholder="Valeur multilignes..."></textarea>
+            </div>
+
+            <!-- Choice/List options editor (Repliable) -->
+            <div class="var-config-field var-options-field hidden">
+                <div class="var-options-header">
+                    <div class="var-options-header-title" style="display: flex; align-items: center; gap: 0.25rem;">
+                        <button type="button" class="btn-icon var-options-toggle-btn" title="Replier/Déplier" style="padding: 2px; display: inline-flex; align-items: center;">
+                            <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s;">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <label class="var-field-label" data-i18n="varChoicesList" style="cursor: pointer; margin: 0;">Options</label>
                     </div>
+                    <button type="button" class="btn secondary small var-add-option-btn">
+                        <span data-i18n="addOption">+ Ajouter</span>
+                    </button>
                 </div>
+                <div class="var-options-list">
+                    <!-- Options ajoutées dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Date format -->
+            <div class="var-config-field var-date-field hidden">
+                <label class="var-field-label" data-i18n="varDateFormat">Format</label>
+                <input type="text" class="var-date-format" value="%d/%m/%Y">
+                <small class="var-helper">Paramètres : %d (jour), %m (mois), %Y (année), %H:%M (heure).</small>
+            </div>
+        </div>
+    </div>
+</template>
+
+                <!-- Option row template -->
+                <template id="varOptionRowTemplate">
+                    <div class="var-option-row">
+                        <input type="text" class="var-option-text" placeholder="Texte affiché">
+                        <textarea class="var-option-value" rows="1" placeholder="Valeur (identique si vide)"></textarea>
+                        <button type="button" class="btn-icon var-option-remove" title="Supprimer">&times;</button>
+                    </div>
+                </template>
 
             </div>
             <div class="modal-footer">
@@ -339,6 +454,7 @@
             </div>
         </div>
     </div>
+
     <!-- Help Modal -->
     <div id="helpModal" class="modal hidden">
         <div class="modal-content">
