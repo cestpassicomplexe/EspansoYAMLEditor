@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:;">
+    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:;">
     <title data-i18n="appTitle">Espanso YAML Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
@@ -32,22 +32,29 @@
                 <button class="lang-btn active" data-lang="fr">FR</button>
                 <button class="lang-btn" data-lang="en">EN</button>
             </div>
-            <button id="btnLoad" class="btn secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span data-i18n="btnOpen">Ouvrir</span>
-            </button>
-            <button id="btnOpenFolder" class="btn secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span data-i18n="btnOpenFolder">Ouvrir un dossier</span>
-            </button>
+
+            <!-- Menu déroulant pour ouvrir (fichier ou dossier) -->
+            <div class="dropdown-container">
+                <button id="btnOpenDropdown" class="btn secondary">
+                    <span data-i18n="btnOpenMenu">Ouvrir</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div id="openMenu" class="dropdown-menu hidden">
+                    <button id="btnLoadFile" class="dropdown-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <span data-i18n="btnLoadFile">Fichier (.yml)</span>
+                    </button>
+                    <button id="btnLoadFolder" class="dropdown-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span data-i18n="btnLoadFolder">Dossier (/match)</span>
+                    </button>
+                </div>
+            </div>
             <div class="dropdown-container">
                 <div class="split-button">
                     <button id="btnSave" class="btn primary">
@@ -80,13 +87,9 @@
                     </button>
                 </div>
             </div>
+            <!-- Bouton d'aide direct -->
             <button id="btnHelp" class="btn secondary" data-i18n-title="btnHelpTitle" title="Aide">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
+                <span>?</span>
             </button>
         </div>
     </header>
@@ -242,6 +245,15 @@
                                 </svg>
                                 <span data-i18n="typeDate">Date</span>
                             </button>
+                            <button class="type-btn-large" data-type="image">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span data-i18n="typeImage">Image</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -356,7 +368,42 @@
                         </div>
                     </div>
 
-                 <!-- Date format config (visible when {{var}} of type "date" detected, or type === "date") -->
+<!-- CONFIGURATION IMAGE -->
+<div id="imageConfigPanel" class="form-group hidden">
+    <label for="imagePathInput">
+        <span data-i18n="imagePathLabel">Chemin de l'image (image_path)</span>
+        <i class="tooltip-icon" data-i18n-tooltip="tooltipImagePath">?</i>
+    </label>
+    <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+        <input type="text" id="imagePathInput" style="flex: 1;" placeholder="$CONFIG/img/mon-image.png">
+        
+        <div class="dropdown-container">
+            <button id="btnLibraryImage" type="button" class="btn secondary" title="Choisir depuis la bibliothèque">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            </button>
+            <div id="libraryDropdown" class="dropdown-menu hidden" style="width: 250px; max-height: 250px; overflow-y: auto; right: 0;">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+
+        <button id="btnSelectImage" type="button" class="btn secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span data-i18n="btnSelectImage">Importer...</span>
+        </button>
+    </div>
+    <input type="file" id="imageFileInput" accept="image/*" class="hidden">
+    <small data-i18n="imagePathHelp">Utilisez le préfixe $CONFIG/ pour un chemin relatif au dossier d'Espanso.</small>
+</div>
+
+<!-- Date format config (visible when {{var}} of type "date" detected, or type === "date") -->
 <div id="dateFormatConfig" class="vars-config hidden">
     <div class="vars-config-header">
         <span data-i18n="dateConfigTitle">Format de date par défaut</span>
@@ -502,7 +549,7 @@
                                 <td>
                                     <code>%APPDATA%\espanso\match\</code>
                                     <button class="btn secondary small btn-copy-mini" data-i18n="btnCopyMini"
-                                        onclick="copyText('%APPDATA%\\espanso\\match\\', this)">Copier</button>
+                                        data-copy-text="%APPDATA%\espanso\match\">Copier</button>
                                 </td>
                             </tr>
                             <tr>
@@ -510,7 +557,7 @@
                                 <td>
                                     <code>~/Library/Application Support/espanso/match/</code>
                                     <button class="btn secondary small btn-copy-mini" data-i18n="btnCopyMini"
-                                        onclick="copyText('~/Library/Application Support/espanso/match/', this)">Copier</button>
+                                        data-copy-text="~/Library/Application Support/espanso/match/">Copier</button>
                                 </td>
                             </tr>
                             <tr>
@@ -518,11 +565,35 @@
                                 <td>
                                     <code>~/.config/espanso/match/</code>
                                     <button class="btn secondary small btn-copy-mini" data-i18n="btnCopyMini"
-                                        onclick="copyText('~/.config/espanso/match/', this)">Copier</button>
+                                        data-copy-text="~/.config/espanso/match/">Copier</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </section>
+
+                <section>
+                    <h3 data-i18n="tutorialSymLinksTitle">🖥️ Tutoriel : Utiliser des liens symboliques sous Windows</h3>
+                    <p data-i18n="tutorialSymLinksDesc">Si vous souhaitez centraliser vos fichiers de raccourcis dans un dossier spécifique (par exemple, pour les synchroniser ou les gérer plus facilement avec l'éditeur), vous pouvez créer un <strong>lien symbolique</strong>. Cela permettra à Espanso de lire vos fichiers comme s'ils étaient au bon endroit, sans que vous ayez à les déplacer.</p>
+                    <p data-i18n="tutorialSymLinksMotivation"><strong>Pas de panique</strong>, la manipulation ne prend que quelques secondes ! Suivez le guide :</p>
+                    <h4 data-i18n="tutorialSymLinksStep1Title">Étape 1 : Ouvrir l'Invite de commande en mode Administrateur</h4>
+                    <ul>
+                        <li data-i18n="tutorialSymLinksStep1a">Cliquez sur le menu <strong>Démarrer</strong> de Windows (ou appuyez sur la touche "Windows" de votre clavier).</li>
+                        <li data-i18n="tutorialSymLinksStep1b">Tapez simplement les trois lettres <strong>cmd</strong>.</li>
+                        <li data-i18n="tutorialSymLinksStep1c">Dans les résultats de recherche, faites un <strong>clic droit</strong> sur <em>Invite de commandes</em> et choisissez <em>Exécuter en tant qu'administrateur</em>.</li>
+                        <li data-i18n="tutorialSymLinksStep1d">Validez par "Oui" si Windows vous demande une autorisation. Une fenêtre noire s'ouvre.</li>
+                    </ul>
+                    <h4 data-i18n="tutorialSymLinksStep2Title">Étape 2 : Préparer et lancer la commande</h4>
+                    <p data-i18n="tutorialSymLinksStep2a">Copiez la ligne ci-dessous, mais attention : avant d'appuyer sur Entrée, vous devez <strong>remplacer la seconde partie</strong> par le chemin du dossier où vous stockez vos raccourcis.</p>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0;">
+                        <code style="flex: 1;">mklink /D "%APPDATA%\espanso\config\match\MonDossier" "C:\Chemin\Vers\Vos\Raccourcis"</code>
+                        <button class="btn secondary small btn-copy-mini" data-i18n="btnCopyMini" data-copy-text='mklink /D "%APPDATA%\espanso\config\match\MonDossier" "C:\Chemin\Vers\Vos\Raccourcis"'>Copier</button>
+                    </div>
+                    <div class="help-tip" data-i18n="tutorialSymLinksStep2b">💡 <strong>Astuce pour ne pas vous tromper de chemin :</strong> Allez dans votre explorateur de fichiers, ouvrez le dossier où se trouvent vos raccourcis, cliquez tout en haut dans la barre d'adresse, et copiez le chemin. Remplacez ensuite "C:\Chemin\Vers\Vos\Raccourcis" par ce que vous venez de copier (gardez bien les guillemets).</div>
+                    <h4 data-i18n="tutorialSymLinksStep3Title">Étape 3 : Vérifier que cela a fonctionné</h4>
+                    <p data-i18n="tutorialSymLinksStep3a">Collez la commande modifiée dans la fenêtre noire (un simple <strong>clic droit</strong> dans la fenêtre suffit souvent à coller le texte) et appuyez sur Entrée.</p>
+                    <p data-i18n="tutorialSymLinksStep3b">Si tout est correct, la console affichera ce message de confirmation : <code>Lien symbolique créé pour [...]</code></p>
+                    <p data-i18n="tutorialSymLinksStep3c">Il ne vous reste plus qu'à <strong>redémarrer Espanso</strong> (en tapant <code>espanso restart</code> dans la console ou via l'icône dans votre barre des tâches) pour qu'il charge vos nouveaux raccourcis.</p>
                 </section>
 
                 <div class="alert-box" data-i18n="securityNote">
