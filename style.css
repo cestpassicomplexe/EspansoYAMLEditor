@@ -1434,6 +1434,9 @@ flex: 0 0 300px;
 /* File Tree View */
 .file-tree {
     width: 100%;
+    /* Mini zone vide sous le dernier élément : cible de drop vers la racine */
+    min-height: 40px;
+    padding-bottom: 8px;
 }
 
 .sidebar-dir-header {
@@ -1496,6 +1499,13 @@ flex: 0 0 300px;
 .sidebar-fallback-banner .fallback-icon {
     font-size: 1rem;
     flex-shrink: 0;
+}
+
+/* Zone de drop vers la racine (fond de l'explorateur de fichiers) */
+.sidebar-files-list.drag-over {
+    background-color: #f0f7ff;
+    outline: 2px dashed var(--primary-color);
+    outline-offset: -2px;
 }
 
 /* File item drag states */

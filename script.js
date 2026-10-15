@@ -1119,7 +1119,24 @@ async function loadFolder() {
     }
 }
 
-async function readDirectory(dirHandle, preserveFileName = null) {
+// --- Lecture de dossier sérialisée (évite les doublons dus à des scans concurrents) ---
+let readDirectoryChain = Promise.resolve();
+let readDirectoryBusy = false;
+function readDirectory(dirHandle, preserveFileName = null) {
+    const run = async () => {
+        readDirectoryBusy = true;
+        try {
+            await readDirectoryImpl(dirHandle, preserveFileName);
+        } finally {
+            readDirectoryBusy = false;
+        }
+    };
+    const next = readDirectoryChain.then(run, run);
+    readDirectoryChain = next.catch(() => {});
+    return next;
+}
+
+async function readDirectoryImpl(dirHandle, preserveFileName = null) {
     if (!preserveFileName && isFolderMode && activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) {
         preserveFileName = folderFiles[activeFolderFileIndex].name;
     }
@@ -1138,7 +1155,7 @@ async function readDirectory(dirHandle, preserveFileName = null) {
             if (aDir && !bDir) return -1; if (!aDir && bDir) return 1; return aFile.localeCompare(bFile);
         });
 
-        folderFiles = [];
+        const newFiles = [];
         for (const f of files) {
             try {
                 const file = await f.handle.getFile();
@@ -1158,7 +1175,7 @@ async function readDirectory(dirHandle, preserveFileName = null) {
                     hasParseError = true;
                     parseErrorMessage = e.message;
                 }
-                folderFiles.push({ 
+                newFiles.push({ 
                     name: f.relativePath, 
                     handle: f.handle, 
                     content: text, 
@@ -1170,6 +1187,7 @@ async function readDirectory(dirHandle, preserveFileName = null) {
             } catch (e) { console.error(`Error reading file ${f.relativePath}:`, e); }
         }
 
+        folderFiles = newFiles;
         folderDirs = dirs.map(d => d.relativePath);
         currentDirHandle = dirHandle;
         isFolderMode = true;
@@ -1535,9 +1553,10 @@ function buildFileTree(fileList) {
 let fileDragData = null;
 
 function handleFileDragStart(e, fileIndex) { fileDragData = { index: fileIndex }; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'file'); e.target.classList.add('dragging'); }
-function handleFileDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.add('drag-over'); }
-function handleFileDragLeave(e) { const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) dz.classList.remove('drag-over'); }
+function handleFileDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) { document.querySelectorAll('.file-tree.drag-over, .sidebar-files-list.drag-over').forEach(el => el.classList.remove('drag-over')); dz.classList.add('drag-over'); } else { const zone = e.target.closest('.sidebar-files-list'); if (zone) zone.classList.add('drag-over'); } }
+function handleFileDragLeave(e) { const dz = e.target.closest('.sidebar-file-item, .sidebar-dir-header'); if (dz) { dz.classList.remove('drag-over'); } else { const zone = e.target.closest('.sidebar-files-list'); if (zone && (!e.relatedTarget || !zone.contains(e.relatedTarget))) zone.classList.remove('drag-over'); } }
 function handleFileDrop(e, targetFileIndex) {
+    e.stopPropagation();
     e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
     if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
     if (fileDragData.index === targetFileIndex) { fileDragData = null; return; }
@@ -1547,6 +1566,7 @@ function handleFileDrop(e, targetFileIndex) {
     moveFileToDirectory(sourceFile, targetDir);
 }
 async function handleFileDropOnDir(e, dirPath) {
+    e.stopPropagation();
     e.preventDefault(); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); if (!fileDragData) return;
     if (!supportsFileSystemAPI || !currentDirHandle) { alert(t('alertNoApi')); fileDragData = null; return; }
     const sourceFile = folderFiles[fileDragData.index]; if (!sourceFile) { fileDragData = null; return; }
@@ -1995,6 +2015,13 @@ function renderSidebar(highlightIndex = -1) {
         }
         renderTreeNode(tree, 0);
         filesContainer.appendChild(treeEl);
+        if (supportsFileSystemAPI) {
+            // Zone de drop « racine » : permet de déplacer un fichier vers la racine du dossier
+            // ouvert, même quand aucun fichier racine ne sert de cible de drop (racine vide).
+            filesContainer.addEventListener('dragover', handleFileDragOver);
+            filesContainer.addEventListener('dragleave', handleFileDragLeave);
+            filesContainer.addEventListener('drop', (e) => handleFileDropOnDir(e, ''));
+        }
         dom.sidebarList.appendChild(filesContainer);
         
         // Triggers section
@@ -3260,6 +3287,7 @@ async function refreshFolderFromDisk(manual) {
     if (!isFolderMode || !currentDirHandle || !window.showDirectoryPicker) return;
     if (!manual) {
         if (hasUnsavedChanges()) return;
+        if (readDirectoryBusy) return;
         if (Date.now() - lastDiskRefreshAt < 2500) return;
     }
     lastDiskRefreshAt = Date.now();
