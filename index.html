@@ -9,7 +9,7 @@
     <title data-i18n="appTitle">Espanso YAML Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
@@ -258,6 +258,9 @@
                     </div>
                 </div>
 
+                <div class="editor-layout">
+                    <div class="editor-main">
+
                 <!-- Trigger -->
                 <div class="form-group">
                     <label for="triggerInput">
@@ -415,15 +418,19 @@
     </div>
 </div>
 
-                    <!-- APERÇU (toujours au bas du bloc) -->
-                    <div id="previewSection" class="preview-section">
-                        <div class="preview-header">
-                            <span class="preview-label" data-i18n="previewLabel">Aperçu</span>
-                            <span id="previewTypeLabel" class="preview-type-label"></span>
-                        </div>
-                        <div id="previewContent" class="preview-content"></div>
+                    </div><!-- /#unifiedEditor -->
+                </div><!-- /.editor-main -->
+
+                <!-- APERÇU (colonne latérale) -->
+                <aside id="previewSection" class="preview-section editor-preview">
+                    <div class="preview-header">
+                        <span class="preview-label" data-i18n="previewLabel">Aperçu</span>
+                        <span id="previewTypeLabel" class="preview-type-label"></span>
                     </div>
-                </div>
+                    <div id="previewContent" class="preview-content"></div>
+                </aside>
+            </div><!-- /.editor-layout -->
+
 
                 <!-- Template pour générer les blocs d'édition de variables inline -->
                 <template id="varConfigRowTemplate">
@@ -462,7 +469,8 @@
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
-                        <label class="var-field-label" data-i18n="varChoicesList" style="cursor: pointer; margin: 0;">Options</label>
+                        <label class="var-field-label" data-i18n="varChoicesList" style="cursor: pointer; margin: 0;">Valeurs</label>
+                        <i class="tooltip-icon" data-i18n-tooltip="tooltipChoiceValues">?</i>
                     </div>
                     <button type="button" class="btn secondary small var-add-option-btn">
                         <span data-i18n="addOption">+ Ajouter</span>
@@ -486,8 +494,7 @@
                 <!-- Option row template -->
                 <template id="varOptionRowTemplate">
                     <div class="var-option-row">
-                        <input type="text" class="var-option-text" placeholder="Texte affiché">
-                        <textarea class="var-option-value" rows="1" placeholder="Valeur (identique si vide)"></textarea>
+                        <input type="text" class="var-option-value" data-i18n-placeholder="optionValuePlaceholder" placeholder="Valeur">
                         <button type="button" class="btn-icon var-option-remove" title="Supprimer">&times;</button>
                     </div>
                 </template>

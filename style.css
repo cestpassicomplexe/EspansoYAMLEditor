@@ -353,6 +353,8 @@ main {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 .modal.hidden {
@@ -398,7 +400,117 @@ main {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    min-height: 0;
+    flex: 1 1 auto;
+    overscroll-behavior: contain;
 }
+
+/* Editor Modal - Two-column layout (fields left, preview right) */
+#editorModal .modal-content {
+    max-width: 1000px;
+    width: calc(100% - 2rem);
+}
+
+.editor-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-height: 0;
+}
+
+.editor-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+#editorModal .editor-main {
+    min-width: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+#editorModal .editor-preview {
+    align-self: stretch;
+    border: 2px solid var(--primary-color);
+    border-radius: 0.5rem;
+    background: #f8fafc;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+#editorModal .editor-preview .preview-header {
+    background: var(--primary-color);
+    border-bottom: none;
+    padding: 0.5rem 0.75rem;
+}
+
+#editorModal .editor-preview .preview-header .preview-label {
+    color: #ffffff;
+}
+
+#editorModal .editor-preview .preview-header .preview-type-label {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Sticky preview card so it stays visible while editing */
+@media (min-width: 768px) {
+    #editorModal .editor-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        align-items: start;
+    }
+
+    #editorModal .editor-main {
+        min-width: 0;
+    }
+
+    #editorModal .editor-preview {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        max-height: calc(90vh - 220px);
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #editorModal .editor-preview .preview-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    /* Result block always visible: distinct highlighted card */
+    #editorModal .editor-preview .preview-result-block {
+        position: sticky;
+        bottom: 0;
+        background: var(--card-bg);
+        padding-top: 0.5rem;
+    }
+
+    #editorModal .editor-preview .preview-result-text {
+        border: 1.5px dashed var(--primary-color);
+        background: #f0f7ff;
+        min-height: 120px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    /* Keep the interactive dual preview readable in the narrow sidebar */
+    #editorModal .editor-preview .interactive-preview-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 
 .modal-footer {
     padding: 1.25rem;

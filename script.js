@@ -61,8 +61,10 @@ const translations = {
         varTypeDate: "Date",
         varDefaultValue: "Valeur par défaut",
         varDateFormat: "Format",
-        varChoicesList: "Options",
+        varChoicesList: "Valeurs",
         addOption: "+ Ajouter",
+        optionValuePlaceholder: "Valeur",
+        tooltipChoiceValues: "Limitation actuelle d'Espanso : dans un formulaire, seule la valeur est affichée et insérée — il n'est pas possible de distinguer un libellé affiché d'une valeur insérée.",
         tooltipContentType: "Choisissez si vous voulez un texte simple, un texte riche (HTML/Markdown), un contenu interactif avec variables, ou une date automatique.",
         tooltipTrigger: "Le mot-clé (souvent commençant par :) qui déclenchera le remplacement.",
         selectTypeTitle: "Quel type de raccourci ?",
@@ -195,8 +197,10 @@ const translations = {
         varTypeDate: "Date",
         varDefaultValue: "Default value",
         varDateFormat: "Format",
-        varChoicesList: "Options",
+        varChoicesList: "Values",
         addOption: "+ Add",
+        optionValuePlaceholder: "Value",
+        tooltipChoiceValues: "Current Espanso limitation: in a form, only the value is displayed and inserted — you cannot have a separate display label and inserted value.",
         tooltipContentType: "Choose between simple text, rich text (HTML/Markdown), interactive content with variables, or an automatic date.",
         tooltipTrigger: "The keyword (often starting with :) that will trigger the replacement.",
         selectTypeTitle: "What type of shortcut?",
@@ -2284,8 +2288,8 @@ function addVarConfigRow(varName) {
         dateField.classList.toggle('hidden', type !== 'date');
 
         if ((type === 'choice' || type === 'list') && optionsList && optionsList.children.length === 0) {
-            addVarOptionRow(optionsList, 'Option 1', 'Valeur 1');
-            addVarOptionRow(optionsList, 'Option 2', 'Valeur 2');
+            addVarOptionRow(optionsList, 'Valeur 1');
+            addVarOptionRow(optionsList, 'Valeur 2');
         }
     };
 
@@ -2309,7 +2313,7 @@ function addVarConfigRow(varName) {
 
     if (addOptionBtn) {
         addOptionBtn.addEventListener('click', () => {
-            addVarOptionRow(optionsList, '', '');
+            addVarOptionRow(optionsList, '');
             updatePreview();
         });
     }
@@ -2342,16 +2346,14 @@ function addVarConfigRow(varName) {
 
 // --- Add option row ---
 
-function addVarOptionRow(container, text = '', value = '') {
+function addVarOptionRow(container, value = '') {
     const template = dom.varOptionRowTemplate;
     if (!template) return;
     const clone = template.content.cloneNode(true);
     const row = clone.querySelector('.var-option-row');
-    const textInput = row.querySelector('.var-option-text');
     const valueInput = row.querySelector('.var-option-value');
     const removeBtn = row.querySelector('.var-option-remove');
 
-    if (textInput) { textInput.value = text; textInput.addEventListener('input', updatePreview); }
     if (valueInput) { valueInput.value = value; valueInput.addEventListener('input', updatePreview); }
     if (removeBtn) { removeBtn.addEventListener('click', () => { row.remove(); updatePreview(); }); }
 
@@ -2386,14 +2388,10 @@ function getVarsConfig() {
             const optionRows = optionsList ? optionsList.querySelectorAll('.var-option-row') : [];
             const values = [];
             optionRows.forEach(optRow => {
-                const optText = optRow.querySelector('.var-option-text').value.trim();
-                const optVal = optRow.querySelector('.var-option-value').value;
-                if (optText || optVal) {
-                    if (optText && optVal && optText !== optVal) {
-                        values.push({ text: optText, value: optVal });
-                    } else {
-                        values.push(optVal || optText);
-                    }
+                const valueInput = optRow.querySelector('.var-option-value');
+                const val = valueInput ? valueInput.value.trim() : '';
+                if (val) {
+                    values.push(val);
                 }
             });
             config[varName].values = values;
@@ -2789,9 +2787,10 @@ function populateEditor(match) {
                                     if (values) {
                                         values.forEach(val => {
                                             if (typeof val === 'object' && val !== null) {
-                                                addVarOptionRow(optionsList, val.label || val.text || '', val.id || val.value || '');
+                                                // Rétrocompatibilité : anciens fichiers avec {text, value} -> on ne garde que la valeur (limitation Espanso)
+                                                addVarOptionRow(optionsList, val.value ?? val.text ?? val.id ?? '');
                                             } else {
-                                                addVarOptionRow(optionsList, val, val);
+                                                addVarOptionRow(optionsList, val);
                                             }
                                         });
                                     }
