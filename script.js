@@ -81,6 +81,10 @@ const translations = {
         sidebarTitle: "Explorateur",
         btnNewFile: "Nouveau fichier YML",
         btnNewFolder: "Nouveau dossier",
+        btnRefreshFolder: "Actualiser",
+        statusRefreshing: "Actualisation du dossier...",
+        statusRefreshed: "Dossier actualisé.",
+        errorRefreshing: "Erreur lors de l'actualisation du dossier.",
         promptFileName: "Nom du fichier YML :",
         promptFolderName: "Nom du dossier :",
         newFileCreated: "Nouveau fichier créé : ",
@@ -217,6 +221,10 @@ const translations = {
         sidebarTitle: "Explorer",
         btnNewFile: "New YML file",
         btnNewFolder: "New folder",
+        btnRefreshFolder: "Refresh",
+        statusRefreshing: "Refreshing folder...",
+        statusRefreshed: "Folder refreshed.",
+        errorRefreshing: "Error refreshing the folder.",
         promptFileName: "YML file name:",
         promptFolderName: "Folder name:",
         newFileCreated: "New file created: ",
@@ -339,6 +347,7 @@ const dom = {
     btnDeleteMatch: document.getElementById('btnDeleteMatch'),
     typeOverlay: document.getElementById('typeOverlay'),
     typeButtons: document.querySelectorAll('.type-btn-large'),
+    btnCloseTypeOverlay: document.getElementById('btnCloseTypeOverlay'),
 
     triggerInput: document.getElementById('triggerInput'),
     contentInput: document.getElementById('contentInput'),
@@ -360,6 +369,17 @@ const dom = {
     // New folder/file buttons
     btnNewFile: document.getElementById('btnNewFile'),
     btnNewFolder: document.getElementById('btnNewFolder'),
+    btnRefreshFolder: document.getElementById('btnRefreshFolder'),
+
+    // Name prompt modal (create file/folder)
+    namePromptModal: document.getElementById('namePromptModal'),
+    namePromptTitle: document.getElementById('namePromptTitle'),
+    namePromptLabel: document.getElementById('namePromptLabel'),
+    namePromptInput: document.getElementById('namePromptInput'),
+    namePromptError: document.getElementById('namePromptError'),
+    btnNamePromptConfirm: document.getElementById('btnNamePromptConfirm'),
+    btnNamePromptCancel: document.getElementById('btnNamePromptCancel'),
+    btnNamePromptCancelFooter: document.getElementById('btnNamePromptCancelFooter'),
 
     // Lang buttons
     langBtns: document.querySelectorAll('.lang-btn'),
@@ -398,6 +418,7 @@ function init() {
 
     updateLanguageUI();
     setupEventListeners();
+    setupFolderSyncListeners();
     renderMatches();
     updateYamlPreview();
 
@@ -454,6 +475,13 @@ function setupEventListeners() {
 
     dom.btnCloseModal.addEventListener('click', closeEditor);
     dom.btnCancel.addEventListener('click', closeEditor);
+    if (dom.btnCloseTypeOverlay) dom.btnCloseTypeOverlay.addEventListener('click', closeEditor);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dom.editorModal && !dom.editorModal.classList.contains('hidden')
+            && dom.typeOverlay && !dom.typeOverlay.classList.contains('hidden')) {
+            closeEditor();
+        }
+    });
 
     // Help - ouvre la modale et scrolle vers le tutoriel liens symboliques
     dom.btnHelp.addEventListener('click', () => {
@@ -3104,58 +3132,170 @@ function formatDateString(format) {
     return format.replace(/%d/g, day).replace(/%m/g, month).replace(/%Y/g, year).replace(/%H/g, hour).replace(/%M/g, minute).replace(/%S/g, second).replace(/%A/g, cap(dayName)).replace(/%B/g, cap(monthName));
 }
 
-// --- Create New File/Folder ---
-
+// --- Create New File/Folder : helpers activation + modale non-bloquante ---
+async function ensureDirWriteAccess(dirHandle) {
+    if (!dirHandle || !dirHandle.queryPermission) return true;
+    try {
+        if ((await dirHandle.queryPermission({ mode: 'readwrite' })) === 'granted') return true;
+        return (await dirHandle.requestPermission({ mode: 'readwrite' })) === 'granted';
+    } catch (e) {
+        return true;
+    }
+}
+let namePromptResolver = null;
+function askNameViaModal(opts) {
+    if (!dom.namePromptModal) { return Promise.resolve(prompt(opts.title, opts.defaultValue)); }
+    dom.namePromptTitle.innerText = opts.title;
+    if (dom.namePromptLabel) dom.namePromptLabel.innerText = opts.label || opts.title;
+    dom.namePromptInput.value = opts.defaultValue || '';
+    dom.namePromptError.classList.add('hidden');
+    dom.namePromptError.innerText = '';
+    dom.namePromptModal.classList.remove('hidden');
+    if (namePromptResolver) { namePromptResolver(null); namePromptResolver = null; }
+    return new Promise((resolve) => {
+        namePromptResolver = resolve;
+        const cleanup = () => {
+            dom.namePromptModal.classList.add('hidden');
+            dom.btnNamePromptConfirm.onclick = null;
+            if (dom.btnNamePromptCancel) dom.btnNamePromptCancel.onclick = null;
+            if (dom.btnNamePromptCancelFooter) dom.btnNamePromptCancelFooter.onclick = null;
+            dom.namePromptInput.onkeydown = null;
+        };
+        const cancel = () => { cleanup(); namePromptResolver = null; resolve(null); };
+        const confirmFn = () => {
+            const value = dom.namePromptInput.value.trim();
+            if (opts.validate && !opts.validate(value)) {
+                dom.namePromptError.innerText = opts.errorMessage || 'Nom invalide.';
+                dom.namePromptError.classList.remove('hidden');
+                dom.namePromptInput.focus();
+                return;
+            }
+            cleanup(); namePromptResolver = null; resolve(value);
+        };
+        dom.btnNamePromptConfirm.onclick = confirmFn;
+        if (dom.btnNamePromptCancel) dom.btnNamePromptCancel.onclick = cancel;
+        if (dom.btnNamePromptCancelFooter) dom.btnNamePromptCancelFooter.onclick = cancel;
+        dom.namePromptInput.onkeydown = (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); confirmFn(); }
+            if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+        };
+        setTimeout(() => { dom.namePromptInput.focus(); dom.namePromptInput.select(); }, 50);
+    });
+}
+function defaultYmlContent() {
+    const NL = String.fromCharCode(10);
+    return '# espanso match file' + NL + '# Generated by Espanso Editor' + NL + NL + 'matches:' + NL;
+}
+async function writeNewYmlFile(finalName) {
+    const fileHandle = await currentDirHandle.getFileHandle(finalName, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(defaultYmlContent());
+    await writable.close();
+}
+function downloadYmlFallback(finalName) {
+    const blob = new Blob([defaultYmlContent()], { type: 'text/yaml;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = finalName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 async function createNewFile() {
     if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
-    const fileName = prompt(t('promptFileName'), 'nouveau.yml');
+    const allowed = await ensureDirWriteAccess(currentDirHandle);
+    if (!allowed) { alert(t('errorCreatingFile')); return; }
+    const fileName = await askNameViaModal({
+        title: t('promptFileName'),
+        label: t('promptFileName'),
+        defaultValue: 'nouveau.yml',
+        validate: (v) => v && v.length > 0,
+        errorMessage: 'Nom invalide.'
+    });
     if (!fileName) return;
     let finalName = fileName;
     if (!finalName.endsWith('.yml') && !finalName.endsWith('.yaml')) finalName += '.yml';
     try {
         if (window.showDirectoryPicker && currentDirHandle) {
-            let fileHandle;
-            try {
-                fileHandle = await currentDirHandle.getFileHandle(finalName);
-                if (!confirm(t('confirmOverwriteFile'))) return;
-                const writable = await fileHandle.createWritable();
-                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
-                await writable.write(defaultContent); await writable.close();
-            } catch (e) {
-                fileHandle = await currentDirHandle.getFileHandle(finalName, { create: true });
-                const writable = await fileHandle.createWritable();
-                const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
-                await writable.write(defaultContent); await writable.close();
-            }
+            const allowed2 = await ensureDirWriteAccess(currentDirHandle);
+            if (!allowed2) { alert(t('errorCreatingFile')); return; }
+            let exists = false;
+            try { await currentDirHandle.getFileHandle(finalName); exists = true; } catch (e) { exists = false; }
+            if (exists && !confirm(t('confirmOverwriteFile'))) return;
+            await writeNewYmlFile(finalName);
         } else {
-            const defaultContent = `# espanso match file\n# Generated by Espanso Editor\n\nmatches:\n`;
-            const blob = new Blob([defaultContent], { type: 'text/yaml;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a'); link.href = url; link.download = finalName;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+            downloadYmlFallback(finalName);
         }
         dom.statusMessage.innerText = t('newFileCreated') + finalName;
-        if (window.showDirectoryPicker && currentDirHandle) await readDirectory(currentDirHandle);
+        if (window.showDirectoryPicker && currentDirHandle) await readDirectory(currentDirHandle, finalName);
+        return;
     } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating file:', err); alert(t('errorCreatingFile')); } }
 }
 
 async function createNewFolder() {
     if (!isFolderMode || !currentDirHandle) { alert(t('noFolderOpened')); return; }
     if (!window.showDirectoryPicker) { alert(t('errorCreatingFolder') + ' ' + t('alertNoApi')); return; }
-    const folderName = prompt(t('promptFolderName'), 'nouveau-dossier');
+    const allowed = await ensureDirWriteAccess(currentDirHandle);
+    if (!allowed) { alert(t('errorCreatingFolder')); return; }
+    const folderName = await askNameViaModal({
+        title: t('promptFolderName'),
+        label: t('promptFolderName'),
+        defaultValue: 'nouveau-dossier',
+        validate: (v) => v && /^[a-zA-Z0-9_\- ]+$/.test(v),
+        errorMessage: t('errorCreatingFolder')
+    });
     if (!folderName) return;
-    if (!/^[a-zA-Z0-9_\- ]+$/.test(folderName)) { alert(t('errorCreatingFolder')); return; }
     try {
         await currentDirHandle.getDirectoryHandle(folderName, { create: true });
-        
-        if (!folderDirs.includes(folderName)) {
-            folderDirs.push(folderName);
-        }
-        
         dom.statusMessage.innerText = t('newFolderCreated') + folderName;
-        await readDirectory(currentDirHandle);
+        await readDirectory(currentDirHandle, folderName);
     } catch (err) { if (err.name !== 'AbortError') { console.error('Error creating folder:', err); alert(t('errorCreatingFolder')); } }
 }
 
+// --- Folder disk synchronisation (manual refresh + auto on focus) ---
+let lastDiskRefreshAt = 0;
+async function refreshFolderFromDisk(manual) {
+    if (!isFolderMode || !currentDirHandle || !window.showDirectoryPicker) return;
+    if (!manual) {
+        if (hasUnsavedChanges()) return;
+        if (Date.now() - lastDiskRefreshAt < 2500) return;
+    }
+    lastDiskRefreshAt = Date.now();
+    if (manual) {
+        if (dom.btnRefreshFolder) dom.btnRefreshFolder.classList.add('is-spinning');
+        if (dom.statusMessage) dom.statusMessage.innerText = t('statusRefreshing');
+    }
+    try {
+        const dirtySnapshots = {};
+        folderFiles.forEach((f) => { if (f.isModified) dirtySnapshots[f.name] = { content: f.content, matches: f.matches }; });
+        const previousActive = (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length) ? folderFiles[activeFolderFileIndex].name : null;
+        await readDirectory(currentDirHandle, previousActive);
+        Object.keys(dirtySnapshots).forEach((name) => {
+            const f = folderFiles.find((x) => x.name === name);
+            if (f) { f.content = dirtySnapshots[name].content; f.matches = dirtySnapshots[name].matches; f.isModified = true; }
+        });
+        if (activeFolderFileIndex >= 0 && activeFolderFileIndex < folderFiles.length && folderFiles[activeFolderFileIndex].isModified) {
+            selectFolderFile(activeFolderFileIndex);
+        }
+        if (manual && dom.statusMessage) dom.statusMessage.innerText = t('statusRefreshed');
+    } catch (err) {
+        console.warn('Folder refresh failed:', err);
+        if (manual && dom.statusMessage) dom.statusMessage.innerText = t('errorRefreshing');
+    } finally {
+        if (manual && dom.btnRefreshFolder) dom.btnRefreshFolder.classList.remove('is-spinning');
+    }
+}
+function setupFolderSyncListeners() {
+    if (dom.btnRefreshFolder) {
+        dom.btnRefreshFolder.addEventListener('click', () => refreshFolderFromDisk(true));
+    }
+    const autoRefresh = () => {
+        if (document.visibilityState === 'visible') refreshFolderFromDisk(false);
+    };
+    document.addEventListener('visibilitychange', autoRefresh);
+    window.addEventListener('focus', autoRefresh);
+}
 // Start
 init();

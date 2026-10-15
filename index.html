@@ -7,6 +7,7 @@
     <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:;">
     <title data-i18n="appTitle">Espanso YAML Editor</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
     <link rel="stylesheet" href="style.css?v=3">
@@ -123,6 +124,16 @@
                                     <line x1="9" y1="14" x2="15" y2="14"></line>
                                 </svg>
                             </button>
+                            <button id="btnRefreshFolder" class="btn-icon" data-i18n-title="btnRefreshFolder"
+                                title="Actualiser">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15">
+                                    </path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     <div id="sidebarList" class="sidebar-list">
@@ -188,6 +199,25 @@
     </main>
 
     <!-- Modal d'édition UNIFIÉ -->
+    <div id="namePromptModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2 id="namePromptTitle">Nouveau fichier</h2>
+                <button class="close-btn" id="btnNamePromptCancel" type="button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="namePromptInput" id="namePromptLabel">Nom</label>
+                    <input type="text" id="namePromptInput" class="form-input" autocomplete="off" spellcheck="false">
+                    <small id="namePromptError" class="form-error hidden"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnNamePromptCancelFooter" class="btn secondary" type="button" data-i18n="btnCancel">Annuler</button>
+                <button id="btnNamePromptConfirm" class="btn primary" type="button" data-i18n="btnSaveMatch">Valider</button>
+            </div>
+        </div>
+    </div>
     <div id="editorModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -197,6 +227,7 @@
             <div class="modal-body">
                 <!-- Overlay de sélection de type (pour NOUVEAU match seulement) -->
                 <div id="typeOverlay" class="type-overlay">
+                    <button class="type-overlay-close-btn" id="btnCloseTypeOverlay" type="button">&times;</button>
                     <div class="type-selection-content">
                         <h3 data-i18n="selectTypeTitle">Quel type de raccourci ?</h3>
                         <p data-i18n="selectTypeDesc">Choisissez le format de base.</p>
